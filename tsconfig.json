@@ -3,14 +3,13 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
     "incremental": true,
     "plugins": [
       {
@@ -18,8 +17,11 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["/src/*"]
+    },
+    "checkJs": true, // Activez la vérification des types dans les fichiers JS
+    "jsx": "preserve", // Activez le support JSX pour React
+    "allowSyntheticDefaultImports": true // Permettez les imports par défau
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
