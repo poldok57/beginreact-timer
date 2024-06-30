@@ -13,7 +13,6 @@ import {
 
 import { CountdownTimer } from "../components/timer/CountdownTimer";
 import { formatDuration } from "../lib/timer/formatDuration";
-import { format } from "path";
 
 interface TimerDisplayProps {
   timer: Timer;
