@@ -9,7 +9,7 @@ export const TimerList = () => {
   const ref = useRef<HTMLDivElement>(null);
   return (
     <div className="max-w-fit justify-center">
-      {timers.filter((timer: Timer) => timer.isLarge).length > 0 && (
+      {timers.filter((timer: Timer) => timer.isLarge).length > 0 ? (
         <div ref={ref} className="flex flex-col items-center mx-auto w-fit">
           {timers
             .filter((timer: Timer) => timer.isLarge)
@@ -20,6 +20,8 @@ export const TimerList = () => {
               </div>
             ))}
         </div>
+      ) : (
+        <></>
       )}
 
       <div
@@ -34,7 +36,7 @@ export const TimerList = () => {
             </div>
           ))}
       </div>
-      {timers.filter((timer: Timer) => timer.isMinimized).length > 0 && (
+      {timers.filter((timer: Timer) => timer.isMinimized).length > 0 ? (
         <div ref={ref} className="fixed items-center bottom-0 left-0 w-48">
           {timers
             .filter((timer: Timer) => timer.isMinimized)
@@ -45,6 +47,8 @@ export const TimerList = () => {
               </div>
             ))}
         </div>
+      ) : (
+        <></>
       )}
     </div>
   );

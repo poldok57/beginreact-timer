@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, KeyboardEvent } from "react";
 import { filesetVariants, lengendVariants } from "../style/form-variants";
+import clsx from "clsx";
 
 interface TimerInputNameProps {
   timerName: string;
@@ -32,7 +33,10 @@ export const TimerInputName: React.FC<TimerInputNameProps> = ({
       <legend className={lengendVariants({ size: "sm" })}>Timer name</legend>
       <input
         ref={inputRef}
-        className="rounded-md items-center w-40"
+        className={clsx("rounded-md items-center", {
+          "w-full": !focus,
+          "w-40": focus,
+        })}
         type="text"
         value={timerName}
         onChange={(e) => onChange(e.target.value)}
