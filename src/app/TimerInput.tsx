@@ -1,50 +1,13 @@
 // @ts-nocheck
 "use client";
 import { ChangeEvent, useState, useRef } from "react";
-import { useEventListener } from "../hooks/useEventListener";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 import { buttonVariants, lengendVariants } from "../style/form-variants";
 import { TwoDigitInput } from "./TwoDigitInput";
 import { Time } from "../types/timer";
 import { useTimersStore } from "../hooks/zustand/timers";
 import { filesetVariants } from "../style/form-variants";
-
-const getFocusableElements = (ref) =>
-  Array.from(
-    ref.current.querySelectorAll("a[href], button, textarea, input, select")
-  );
-const useFocusTrap = (ref) => {
-  const handleKey = (event) => {
-    if (event.key !== "Tab") return;
-
-    const focusableElements = getFocusableElements(ref);
-
-    const activeElement = document.activeElement;
-
-    let nextIndex = event.shiftKey
-      ? focusableElements.indexOf(activeElement) - 1
-      : focusableElements.indexOf(activeElement) + 1;
-
-    const toFocusElement = focusableElements[nextIndex];
-
-    if (toFocusElement) {
-      // let's DOM handle the focus
-      return;
-    }
-    // element outside the dialog let's loop on Dialog's focusable elements
-    nextIndex = nextIndex < 0 ? focusableElements.length - 1 : 0;
-
-    focusableElements[nextIndex].focus();
-    event.preventDefault();
-    return;
-  };
-
-  useEventListener({
-    handler: handleKey,
-    isEnabled: true,
-    type: "keydown",
-    element: typeof document !== "undefined" ? document : null,
-  });
-};
+import { TimerInputName } from "./TimerInputName";
 
 type Time = {
   h: string;
@@ -105,8 +68,9 @@ export const TimerInput = () => {
     const newTimer = {
       id: Date.now().toString(),
       duration,
+      timeLeft: duration,
       endAt: Date.now() + duration * 1000,
-      isPaused: false,
+      isRunning: false,
       isMinimized: false,
       title: timerName,
     };
@@ -151,17 +115,11 @@ export const TimerInput = () => {
               />
             </div>
           </fieldset>
-          <fieldset className={filesetVariants({ bg: "base200" })}>
-            <legend className={lengendVariants({ size: "sm" })}>
-              Timer name
-            </legend>
-            <input
-              className="w-fit p-2 rounded-md items-center"
-              type="text"
-              value={timerName}
-              onChange={(e) => setTimerName(e.target.value)}
-            />
-          </fieldset>
+          <TimerInputName
+            timerName={timerName}
+            onChange={setTimerName}
+            handleValide={() => {}}
+          />
         </div>
       </div>
       <div class="card-actions flex flex-row justify-between px-4 pb-4 gap-4">

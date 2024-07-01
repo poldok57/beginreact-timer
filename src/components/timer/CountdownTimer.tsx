@@ -85,7 +85,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         y="50%"
         textAnchor="middle"
         dy=".3em"
-        fontSize="24px"
+        fontSize={radius * 0.4}
         fill={timeColor}
       >
         {/* {remainingTime.toFixed(0)} */}
@@ -95,7 +95,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         x="50%"
         y="30%"
         textAnchor="middle"
-        fontSize="12px"
+        fontSize="14px"
         fill={textColor}
       >
         {remainingTime > 0 ? "End : " : "Ended : "}
@@ -106,7 +106,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           x="50%"
           y="70%"
           textAnchor="middle"
-          fontSize="10px"
+          fontSize="12px"
           fill={pauseColor}
         >
           timer ({formatDuration(totalDuration)}) elapsed
@@ -121,6 +121,17 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           fill={pauseColor}
         >
           Pause
+        </text>
+      )}
+      {remainingTime > 0 && !isPaused && (
+        <text
+          x="50%"
+          y="70%"
+          textAnchor="middle"
+          fontSize="12px"
+          fill={pauseColor}
+        >
+          Total: {formatDuration(totalDuration)}
         </text>
       )}
     </svg>
