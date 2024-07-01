@@ -29,6 +29,9 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   timeColor = "#fa4",
 }) => {
   const radius = diameter / 2;
+  const fontSizeBig = radius * 0.6;
+  const fontSize1 = radius * 0.15;
+  const fontSize2 = radius * 0.12;
   const normalizedRadius = radius - strokeWidth / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset =
@@ -85,8 +88,9 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         y="50%"
         textAnchor="middle"
         dy=".3em"
-        fontSize={radius * 0.4}
+        fontSize={fontSizeBig}
         fill={timeColor}
+        fontFamily="System-ui, Monospace, Arial"
       >
         {/* {remainingTime.toFixed(0)} */}
         {formatDuration(remainingTime)}
@@ -95,7 +99,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         x="50%"
         y="30%"
         textAnchor="middle"
-        fontSize="14px"
+        fontSize={fontSize1}
         fill={textColor}
       >
         {remainingTime > 0 ? "End : " : "Ended : "}
@@ -106,7 +110,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           x="50%"
           y="70%"
           textAnchor="middle"
-          fontSize="12px"
+          fontSize={fontSize2}
           fill={pauseColor}
         >
           timer ({formatDuration(totalDuration)}) elapsed
@@ -117,7 +121,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           x="50%"
           y="70%"
           textAnchor="middle"
-          fontSize="12px"
+          fontSize={fontSize1}
           fill={pauseColor}
         >
           Pause
@@ -128,7 +132,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           x="50%"
           y="70%"
           textAnchor="middle"
-          fontSize="12px"
+          fontSize={fontSize2}
           fill={pauseColor}
         >
           Total: {formatDuration(totalDuration)}
