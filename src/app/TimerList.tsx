@@ -3,6 +3,9 @@ import React, { useRef } from "react";
 import { useTimersStore } from "../hooks/zustand/timers";
 import { TimerDisplay } from "./TimerDisplay";
 import { Timer } from "../types/timer";
+// import { withMousePosition } from "../tools/withMousePosition";
+
+// const TimerDisplayWP = withMousePosition(TimerDisplay);
 
 export const TimerList = () => {
   const { timers } = useTimersStore();

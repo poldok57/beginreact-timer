@@ -16,6 +16,7 @@ import clsx from "clsx";
 
 import { CountdownTimer } from "../components/timer/CountdownTimer";
 import { formatDuration } from "../lib/timer/formatDuration";
+import { sendNotification } from "../lib/timer/sendNotification";
 
 import { TimerInputName } from "./TimerInputName";
 interface TimerDisplayProps {
@@ -96,6 +97,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
         timer.isPaused = true;
         timer.timeLeft = 0;
         clearInterval(interval);
+        sendNotification({ title: timer.title ?? "Timer" });
       }
       setTimeLeft(timer.timeLeft);
     }, 1000);
@@ -133,29 +135,28 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
           </div>
         </div>
       ) : (
-        <div className="card-body items-center text-center p-2">
-          <h2 className="card-title">
-            {isEditing ? (
-              <TimerInputName
-                timerName={timer.title}
-                focus={true}
-                onChange={(newName) => {
-                  timer.title = newName;
-                  updateTimer(timer.id, timer);
-                }}
-                handleValide={() => setIsEditing(false)}
-              />
-            ) : (
+        <div className="card-body items-center p-2">
+          {isEditing ? (
+            <TimerInputName
+              timerName={timer.title}
+              focus={true}
+              onChange={(newName) => {
+                timer.title = newName;
+                updateTimer(timer.id, timer);
+              }}
+              handleValide={() => setIsEditing(false)}
+            />
+          ) : (
+            <h2 className="card-title w-full">
               <div
-                className="flex flex-row cursor-pointer items-center justify-start"
+                className="flex flex-row cursor-pointer items-center text-left justify-start"
                 onClick={() => setIsEditing(true)}
               >
-                {"  "}
-                <LucideTimer size={20} />
+                <LucideTimer size={20} />{" "}
                 {timer.title ? timer.title : "Timer Display"}
               </div>
-            )}
-          </h2>
+            </h2>
+          )}
           <CountdownTimer
             baseColor="#ddd"
             remainingColor="#f00"
