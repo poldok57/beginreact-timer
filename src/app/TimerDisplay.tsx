@@ -110,7 +110,8 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
   return (
     <div
       className={clsx("group card w-full border border-neutral", {
-        "p-1 rounded-sm": timer.isMinimized,
+        "p-1 rounded-sm bg-base-200": timer.isMinimized,
+        "bg-base-100": !timer.isMinimized,
       })}
     >
       <div className="absolute flex flex-row gap-1 right-1 top-1">

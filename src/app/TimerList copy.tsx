@@ -1,4 +1,5 @@
-import React, { useRef, useEffect, useState } from "react";
+"use client";
+import React, { useRef } from "react";
 import { useTimersStore } from "../hooks/zustand/timers";
 import { TimerDisplay } from "./TimerDisplay";
 import { Timer } from "../types/timer";
@@ -6,16 +7,6 @@ import { Timer } from "../types/timer";
 export const TimerList = () => {
   const { timers } = useTimersStore();
   const ref = useRef<HTMLDivElement>(null);
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
-
-  if (!hydrated) {
-    return null; // ou un loader si nécessaire
-  }
-
   return (
     <div className="max-w-fit justify-center">
       {timers.filter((timer: Timer) => timer.isLarge).length > 0 ? (
@@ -45,7 +36,6 @@ export const TimerList = () => {
             </div>
           ))}
       </div>
-
       {timers.filter((timer: Timer) => timer.isMinimized).length > 0 ? (
         <div ref={ref} className="fixed items-center bottom-0 left-0 w-48">
           {timers
