@@ -19,7 +19,10 @@ export const TimerList = () => {
   return (
     <div className="max-w-fit justify-center">
       {timers.filter((timer: Timer) => timer.isLarge).length > 0 ? (
-        <div ref={ref} className="flex flex-col items-center mx-auto w-fit">
+        <div
+          ref={ref}
+          className="flex flex-col items-center mx-auto w-fit mb-2"
+        >
           {timers
             .filter((timer: Timer) => timer.isLarge)
             .sort((a: Timer, b: Timer) => b.endAt - a.endAt)

@@ -45,10 +45,6 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [timeLeft, setTimeLeft] = useState(timer.timeLeft);
 
-  // const deleteTimer = () => {
-  //   delTimer(timer.id);
-  // };
-
   const setPaused = (paused: boolean) => {
     if (!paused) {
       timer.endAt = Date.now() + timer.timeLeft;
@@ -75,7 +71,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
     // console.log("Timer restarted", timer);
   };
 
-  const maxWidth = window.innerWidth - 50;
+  const maxDiameter = window.innerWidth - 80;
   // console.log("Screen width:", screenWidth);
 
   useEffect(() => {
@@ -161,7 +157,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
           <CountdownTimer
             baseColor="#ddd"
             remainingColor="#f00"
-            diameter={timer.isLarge ? Math.min(maxWidth, 500) : 200}
+            diameter={timer.isLarge ? Math.min(maxDiameter, 600) : 200}
             totalDuration={timer.duration}
             endTime={timerEnd}
             remainingTime={Math.max(timer.timeLeft, 0) / 1000}
