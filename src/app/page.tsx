@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { TimerInput } from "./TimerInput";
-import { withMousePosition } from "../tools/withMousePosition";
+// import { withMousePosition } from "../tools/withMousePosition";
 
-const TimerInputWP = withMousePosition(TimerInput);
+// const TimerInputWP = withMousePosition(TimerInput);
 
 import { TimerList } from "./TimerList";
 export default function Home() {
