@@ -1,5 +1,6 @@
-import React, { useRef, useEffect, KeyboardEvent } from "react";
+import React, { useRef, useEffect, useState, KeyboardEvent } from "react";
 import { filesetVariants, lengendVariants } from "../style/form-variants";
+import { SketchPicker } from "react-color";
 import clsx from "clsx";
 
 interface TimerInputNameProps {
@@ -16,20 +17,15 @@ export const TimerInputName: React.FC<TimerInputNameProps> = ({
   focus = false,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleValide();
     }
   };
 
-  useEffect(() => {
-    if (focus && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [focus]);
-
   return (
-    <fieldset className={filesetVariants({ bg: "base200" })}>
+    <fieldset className={filesetVariants({ bg: "base200", flex: "row" })}>
       <legend className={lengendVariants({ size: "sm" })}>Timer name</legend>
       <input
         ref={inputRef}

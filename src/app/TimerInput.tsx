@@ -8,6 +8,8 @@ import { Time } from "../types/timer";
 import { useTimersStore } from "../hooks/zustand/timers";
 import { filesetVariants } from "../style/form-variants";
 import { TimerInputName } from "./TimerInputName";
+import { TimerInputColor } from "./TimerInputColor";
+import { PanelBottom } from "lucide-react";
 
 type Time = {
   h: string;
@@ -54,6 +56,10 @@ export const TimerInput = () => {
   const ref = useRef(null);
   const [time, setTime] = useState({ h: "00", m: "01", s: "00" } as Time);
   const [timerName, setTimerName] = useState("");
+  const [isMinimized, setIsMinimized] = useState(false);
+  const toggleMinimize = () => {
+    setIsMinimized(!isMinimized);
+  };
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const newTime: Time = controleTime({ ...time, [name]: value });
@@ -61,16 +67,33 @@ export const TimerInput = () => {
     setTime(controleTime(newTime));
   };
   const { addTimer } = useTimersStore();
+  const [timerData, setTimerData] = useState({
+    isRunning: true,
+    isPaused: false,
+    isMinimized: false,
+    title: "",
+    bgColor: "base-200",
+    pageColor: "base-100",
+    timerColor: "#fa4",
+    textColor: "#eee",
+    pauseColor: "#f22",
+  });
+
+  const setColor = (fieldName: string, value: string) => {
+    setTimerData({ ...timerData, [fieldName]: value });
+  };
 
   const saveTimer = () => {
     const { h, m, s } = time;
     const duration = Number(h) * 3600 + Number(m) * 60 + Number(s);
-    const newTimer = {
+    const newTimer: Timer = {
+      ...timerData,
       id: Date.now().toString(),
       duration,
-      timeLeft: duration,
+      timeLeft: duration * 1000,
       endAt: Date.now() + duration * 1000,
-      isRunning: false,
+      isRunning: true,
+      isPaused: false,
       isMinimized: false,
       title: timerName,
     };
@@ -80,65 +103,85 @@ export const TimerInput = () => {
   useFocusTrap(ref);
 
   return (
-    <div class="card border rounded-md shadow-lg border-base-300">
-      <div class="card-title text-xl justify-center text-neutral p-2">
+    <div class="card border rounded-md shadow-lg min-w-80 border-base-300 my-2">
+      <button
+        className="btn btn-xs absolute top-2 right-2"
+        onClick={toggleMinimize}
+      >
+        <PanelBottom size={16} />
+      </button>
+
+      <div
+        class="card-title text-xl justify-center text-neutral p-2"
+        onClick={() => {
+          if (isMinimized) setIsMinimized(false);
+        }}
+      >
         Timer
       </div>
-      <div class="card-body p-2">
-        <div className="flex flex-col">
-          <fieldset ref={ref} className={filesetVariants({ bg: "base200" })}>
-            <legend className={lengendVariants({ size: "sm" })}>
-              Timer duration
-            </legend>
-            <div className="flex flex-row">
-              <TwoDigitInput
-                fieldName="h"
-                value={time.h}
-                cut={3}
-                onChange={handleInputChange}
+      {!isMinimized ? (
+        <>
+          <div class="card-body p-2">
+            <div className="flex flex-col">
+              <fieldset
+                ref={ref}
+                className={filesetVariants({ bg: "base200" })}
               >
-                :
-              </TwoDigitInput>
-              <TwoDigitInput
-                fieldName="m"
-                value={time.m}
-                cut={3}
-                onChange={handleInputChange}
-              >
-                :
-              </TwoDigitInput>
-              <TwoDigitInput
-                fieldName="s"
-                value={time.s}
-                cut={3}
-                onChange={handleInputChange}
+                <legend className={lengendVariants({ size: "sm" })}>
+                  Timer duration
+                </legend>
+                <div className="flex flex-row">
+                  <TwoDigitInput
+                    fieldName="h"
+                    value={time.h}
+                    cut={3}
+                    onChange={handleInputChange}
+                  >
+                    :
+                  </TwoDigitInput>
+                  <TwoDigitInput
+                    fieldName="m"
+                    value={time.m}
+                    cut={3}
+                    onChange={handleInputChange}
+                  >
+                    :
+                  </TwoDigitInput>
+                  <TwoDigitInput
+                    fieldName="s"
+                    value={time.s}
+                    cut={3}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </fieldset>
+              <TimerInputName
+                timerName={timerName}
+                onChange={setTimerName}
+                handleValide={() => {}}
               />
+              <TimerInputColor timer={timerData} setColor={setColor} />
             </div>
-          </fieldset>
-          <TimerInputName
-            timerName={timerName}
-            onChange={setTimerName}
-            handleValide={() => {}}
-          />
-        </div>
-      </div>
-      <div class="card-actions flex flex-row justify-between px-4 pb-4 gap-4">
-        <button
-          className={buttonVariants({ variant: "warning", size: "sm" })}
-          onClick={() => {
-            setTime({ h: "00", m: "00", s: "00" });
-            setTimerName("");
-          }}
-        >
-          Reset
-        </button>
-        <button
-          className={buttonVariants({ variant: "success", size: "sm" })}
-          onClick={() => saveTimer()}
-        >
-          Add timer
-        </button>
-      </div>
+          </div>
+          <div class="card-actions flex flex-row justify-between px-4 pb-4 gap-4">
+            <button
+              className={buttonVariants({ variant: "warning", size: "sm" })}
+              onClick={() => {
+                setTime({ h: "00", m: "00", s: "00" });
+                setTimerName("");
+              }}
+            >
+              Reset
+            </button>
+            <button
+              className={buttonVariants({ variant: "success", size: "sm" })}
+              onClick={() => saveTimer()}
+            >
+              Add timer
+            </button>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 };

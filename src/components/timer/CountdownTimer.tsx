@@ -4,6 +4,7 @@ import { formatDuration } from "../../lib/timer/formatDuration";
 interface CountdownTimerProps {
   baseColor: string;
   remainingColor: string;
+  bgColor?: string;
   diameter: number;
   totalDuration: number;
   endTime: string;
@@ -24,14 +25,16 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   remainingTime,
   isPaused,
   strokeWidth = 10,
+  bgColor = "transparent",
   textColor = "#eee",
   pauseColor = "#f22",
   timeColor = "#fa4",
 }) => {
   const radius = diameter / 2;
-  const fontSizeBig = radius * 0.6;
+  const fontSizeBig = remainingTime > 3600 ? radius * 0.48 : radius * 0.6;
   const fontSize1 = radius * 0.15;
   const fontSize2 = radius * 0.12;
+
   const normalizedRadius = radius - strokeWidth / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset =
@@ -50,7 +53,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
     <svg height={diameter} width={diameter}>
       <circle
         stroke={baseColor}
-        fill="transparent"
+        fill={bgColor}
         strokeWidth={strokeWidth}
         r={normalizedRadius}
         cx={radius}
@@ -63,8 +66,10 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         r={normalizedRadius}
         cx={radius}
         cy={radius}
+        strokeLinecap="round"
         strokeDasharray={circumference + " " + circumference}
         strokeDashoffset={strokeDashoffset}
+        transform={`rotate(-90 ${radius} ${radius})`} // Rotate to start at the top
         style={{ transition: "stroke-dashoffset 0.35s" }}
       />
       <line

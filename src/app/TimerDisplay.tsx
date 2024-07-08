@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useTimersStore } from "../hooks/zustand/timers";
 import { Timer } from "../types/timer";
 import {
@@ -11,6 +11,7 @@ import {
   Expand,
   Shrink,
   Timer as LucideTimer,
+  Palette,
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -19,37 +20,21 @@ import { formatDuration } from "../lib/timer/formatDuration";
 import { sendNotification } from "../lib/timer/sendNotification";
 
 import { TimerInputName } from "./TimerInputName";
+import { TimerInputColor } from "./TimerInputColor";
+
 interface TimerDisplayProps {
   timer: Timer;
 }
 
 export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
-  const { delTimer, updateTimer } = useTimersStore();
-  const [timerEnd, setTimerEnd] = useState(
-    new Date(timer.endAt).toLocaleTimeString()
-  );
-  const updateTimerEnd = (newEnd: number) => {
-    setTimerEnd(new Date(newEnd).toLocaleTimeString());
-  };
-
-  if (timer.isPaused) {
-    timer.endAt = Date.now() + timer.timeLeft;
-  } else {
-    timer.timeLeft = timer.endAt - Date.now();
-    if (timer.timeLeft <= 0) {
-      timer.isPaused = true;
-      timer.timeLeft = 0;
-    }
-  }
-
+  const { delTimer, getTimer, updateTimer } = useTimersStore();
   const [isEditing, setIsEditing] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(timer.timeLeft);
+  const [dateNow, setDateNow] = useState(Date.now());
 
-  const setPaused = (paused: boolean) => {
-    if (!paused) {
-      timer.endAt = Date.now() + timer.timeLeft;
-    }
-    timer.isPaused = paused;
+  const [showInputColor, setShowInputColor] = useState(false);
+
+  const togglePaused = () => {
+    timer.isPaused = !timer.isPaused;
     updateTimer(timer.id, timer);
   };
 
@@ -63,76 +48,105 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
     updateTimer(timer.id, timer);
   };
 
+  const setColor = (fieldName: string, value: string) => {
+    timer = { ...timer, [fieldName]: value };
+    updateTimer(timer.id, timer);
+  };
+
   const restartTimer = () => {
     timer.endAt = Date.now() + timer.duration * 1000;
+    timer.timeLeft = timer.duration * 1000;
     timer.isPaused = false;
+    timer.isRunning = true;
     updateTimer(timer.id, timer);
-    updateTimerEnd(timer.endAt);
-    // console.log("Timer restarted", timer);
   };
+  timer = getTimer(timer.id);
+
+  const timerEnd = new Date(timer.endAt).toLocaleTimeString();
+  // console.log("Timer end:", timerEnd, "time left:", timer.timeLeft);
 
   const maxDiameter = window.innerWidth - 80;
   // console.log("Screen width:", screenWidth);
 
   useEffect(() => {
-    if (timer.timeLeft <= 0) {
-      // console.log("Timer is done", timer);
+    if (!timer.isRunning) return;
 
-      timer.isPaused = true;
-      timer.timeLeft = 0;
-      return;
-    }
     const interval = setInterval(() => {
-      if (timer.isPaused) {
-        timer.endAt = Date.now() + timer.timeLeft;
-        updateTimerEnd(timer.endAt);
-        return;
-      }
-      timer.timeLeft = timer.endAt - Date.now();
-      if (timer.timeLeft <= 0) {
+      setDateNow(Date.now());
+      console.log("Timer:", timer.title, "time left:", timer.timeLeft / 1000);
+
+      if (timer.timeLeft <= 0 && timer.isRunning) {
         timer.isPaused = true;
+        timer.isRunning = false;
         timer.timeLeft = 0;
-        clearInterval(interval);
+        updateTimer(timer.id, timer);
         sendNotification({ title: timer.title ?? "Timer" });
+        clearInterval(interval);
       }
-      setTimeLeft(timer.timeLeft);
     }, 1000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [timeLeft, timerEnd]);
+  }, [timer.endAt, timer.isPaused, timer.timeLeft, timer.isRunning, dateNow]);
 
   return (
     <div
-      className={clsx("group card w-full border border-neutral", {
-        "p-1 rounded-sm bg-base-200": timer.isMinimized,
-        "bg-base-100": !timer.isMinimized,
+      className={clsx("group card border border-neutral", {
+        "p-1 rounded-sm w-full z-1": timer.isMinimized,
+        "bg-base-100 w-fit z-0": !timer.isMinimized,
       })}
+      style={{ backgroundColor: timer.pageColor }}
     >
       <div className="absolute flex flex-row gap-1 right-1 top-1">
-        <button
-          onClick={() => toggleMinimized()}
-          className=" btn btn-square btn-sm  opacity-10 group-hover:opacity-100"
-        >
-          {timer.isMinimized ? <LucideTimer /> : <PanelBottom size={16} />}
-        </button>
+        {!timer.isMinimized ? (
+          <>
+            <button className="btn btn-square btn-sm  opacity-10 group-hover:opacity-100">
+              <Palette
+                size={16}
+                onClick={() => setShowInputColor(!showInputColor)}
+              />
+            </button>
+            <button
+              onClick={() => toggleMinimized()}
+              className=" btn btn-square btn-sm  opacity-10 group-hover:opacity-100"
+            >
+              {timer.isMinimized ? <LucideTimer /> : <PanelBottom size={16} />}
+            </button>
+          </>
+        ) : null}
         <button className="btn btn-square btn-sm  opacity-10 group-hover:opacity-100">
           <X onClick={() => delTimer(timer.id)} size={16} />
         </button>
       </div>
       {timer.isMinimized ? (
-        <div className="flex flex-row p-2 w-full justify-between">
-          <div className="flex flex-row truncate">
+        <div
+          className="flex flex-row p-1 w-full justify-between cursor-pointer"
+          onClick={() => toggleMinimized()}
+        >
+          <div
+            className="flex flex-row truncate"
+            style={{ color: timer.textColor }}
+          >
             {timer.title ? timer.title : "Timer "}
           </div>
-          <div className="flex flex-row">
+          <div
+            className="flex flex-row font-mono"
+            style={{ color: timer.textColor }}
+          >
             {timer.isPaused ? <Pause size={20} /> : <LucideTimer size={20} />}{" "}
             {formatDuration(timer.timeLeft / 1000)}
           </div>
         </div>
       ) : (
         <div className="card-body items-center p-2">
+          {showInputColor && (
+            <TimerInputColor
+              timer={timer}
+              setColor={setColor}
+              onClose={() => setShowInputColor(false)}
+            />
+          )}
           {isEditing ? (
             <TimerInputName
               timerName={timer.title}
@@ -146,7 +160,8 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
           ) : (
             <h2 className="card-title w-full">
               <div
-                className="flex flex-row cursor-pointer items-center text-left justify-start"
+                className="flex flex-row cursor-pointer items-center text-left justify-start gap-1"
+                style={{ color: timer.textColor }}
                 onClick={() => setIsEditing(true)}
               >
                 <LucideTimer size={20} />{" "}
@@ -157,25 +172,29 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
           <CountdownTimer
             baseColor="#ddd"
             remainingColor="#f00"
+            bgColor={timer.bgColor}
+            timeColor={timer.timerColor}
+            pauseColor={timer.pauseColor}
+            textColor={timer.textColor}
             diameter={timer.isLarge ? Math.min(maxDiameter, 600) : 200}
             totalDuration={timer.duration}
             endTime={timerEnd}
             remainingTime={Math.max(timer.timeLeft, 0) / 1000}
             isPaused={timer.isPaused}
-            strokeWidth={timer.isLarge ? 10 : 6}
+            strokeWidth={timer.isLarge ? 12 : 6}
           />
-          <div className="absolute bottom-1 left-1">
-            <button onClick={() => toggleLarge()}>
+          <div className="absolute bottom-1 left-1  opacity-0 group-hover:opacity-90">
+            <button className="btn btn-xs" onClick={() => toggleLarge()}>
               {timer.isLarge ? <Shrink size={20} /> : <Expand size={20} />}
             </button>
           </div>
-          <div className="absolute bottom-1 right-1">
+          <div className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-90">
             {timer.timeLeft <= 0 ? (
-              <button onClick={() => restartTimer()}>
+              <button className="btn btn-xs" onClick={() => restartTimer()}>
                 <RotateCcw size={20} />
               </button>
             ) : (
-              <button onClick={() => setPaused(!timer.isPaused)}>
+              <button className="btn btn-xs" onClick={() => togglePaused()}>
                 {timer.isPaused ? <Play size={20} /> : <Pause size={20} />}
               </button>
             )}

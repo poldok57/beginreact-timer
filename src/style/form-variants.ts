@@ -87,7 +87,7 @@ export const filesetVariants = cva(
         accent: "bg-accent",
       },
       flex: {
-        row: "flex flex-row",
+        row: "flex flex-row items-center justify-between gap-2",
         col: "flex flex-col",
       },
     },

@@ -1,24 +1,30 @@
 import { X } from "lucide-react";
-
 import clsx from "clsx";
+import React, { MouseEventHandler } from "react";
 
-export const CloseButton = ({
+interface CloseButtonProps {
+  onClick: MouseEventHandler<HTMLButtonElement>;
+  className?: string;
+  size?: "2xl" | "xl" | "md" | "sm" | "xs";
+}
+
+export const CloseButton: React.FC<CloseButtonProps> = ({
   onClick,
-  className = null,
-  size = null,
+  className,
+  size = "md",
   ...props
 }) => {
   return (
     <button
       {...props}
       className={clsx(
-        "z-40 rounded border border-black bg-red-600 text-lg text-white opacity-30 group-hover:opacity-95",
+        "z-40 rounded border border-black bg-red-600 text-lg text-white opacity-30",
         {
           "text-2xl": size === "2xl",
           "text-xl": size === "xl",
-          "text-lg": size === "lg",
           "text-md": size === "md",
           "text-sm": size === "sm",
+          "text-xs": size === "xs",
         },
         className
       )}

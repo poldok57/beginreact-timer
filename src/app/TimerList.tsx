@@ -1,10 +1,13 @@
-import React, { useRef, useEffect, useState } from "react";
+"use client";
+import React, { useRef, useEffect, useState, use } from "react";
 import { useTimersStore } from "../hooks/zustand/timers";
 import { TimerDisplay } from "./TimerDisplay";
 import { Timer } from "../types/timer";
 
 export const TimerList = () => {
-  const { timers } = useTimersStore();
+  const { timers, setTimers } = useTimersStore();
+  const now = Date.now();
+
   const ref = useRef<HTMLDivElement>(null);
   const [hydrated, setHydrated] = useState(false);
 
@@ -18,6 +21,28 @@ export const TimerList = () => {
 
   return (
     <div className="max-w-fit justify-center">
+      {timers.length &&
+      timers.filter((timer: Timer) => timer.isMinimized).length > 0 ? (
+        <div ref={ref} className="fixed items-center bottom-0 left-0 w-48">
+          {timers
+            .filter((timer: Timer) => timer.isMinimized)
+            .sort((a: Timer, b: Timer) => {
+              const remainingTimeA = a.endAt - now;
+              const remainingTimeB = b.endAt - now;
+              if (remainingTimeA < 0 && remainingTimeB < 0) return 0; // Les deux timers sont passés, ne change pas l'ordre
+              if (remainingTimeA < 0) return 1; // A est passé, B vient en premier
+              if (remainingTimeB < 0) return -1; // B est passé, A vient en premier
+              return remainingTimeA - remainingTimeB; // Compare par temps restant
+            })
+            .map((timer: Timer) => (
+              <div key={timer.id} className="flex flex-col items-center">
+                <TimerDisplay timer={timer} />
+              </div>
+            ))}
+        </div>
+      ) : (
+        <></>
+      )}
       {timers.filter((timer: Timer) => timer.isLarge).length > 0 ? (
         <div
           ref={ref}
@@ -48,21 +73,6 @@ export const TimerList = () => {
             </div>
           ))}
       </div>
-
-      {timers.filter((timer: Timer) => timer.isMinimized).length > 0 ? (
-        <div ref={ref} className="fixed items-center bottom-0 left-0 w-48">
-          {timers
-            .filter((timer: Timer) => timer.isMinimized)
-            .sort((a: Timer, b: Timer) => b.endAt - a.endAt)
-            .map((timer: Timer) => (
-              <div key={timer.id} className="flex flex-col items-center">
-                <TimerDisplay timer={timer} />
-              </div>
-            ))}
-        </div>
-      ) : (
-        <></>
-      )}
     </div>
   );
 };

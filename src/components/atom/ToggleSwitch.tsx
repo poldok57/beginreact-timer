@@ -1,48 +1,40 @@
-import React, { ReactNode, ChangeEvent } from "react";
+import React, { ReactNode, ChangeEventHandler } from "react";
 import clsx from "clsx";
-
-/**
- * ToggleSwitch component
- * @param {object} props
- * @param {string} props.color - color of the switch (red, green, blue)
- * @param {string} props.initialColor - initial color of the switch (red, green, blue, gray)
- * @param {boolean} props.defaultChecked - initial state of the switch
- * @param {function} props.onChange - function to call when the switch is toggled
- * @param {object} props.children - children to render
- */
 
 interface ToggleSwitchProps {
   color?: "red" | "green" | "blue";
   initialColor?: "red" | "green" | "blue" | "gray";
   defaultChecked?: boolean;
-  onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
   children?: ReactNode;
   id?: string;
 }
 
 export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
-  children,
+  children = null,
   onChange,
   defaultChecked,
   color = "blue",
   id,
   initialColor = "gray",
+  className,
   ...props
 }) => {
   return (
-    <div {...props}>
-      <label className="relative inline-flex cursor-pointer items-center">
+    <div {...props} className={className}>
+      <label className="relative inline-flex items-center cursor-pointer">
         <input
           id={id}
           alt="toggle switch input"
           type="checkbox"
-          className="peer sr-only"
+          className="sr-only peer"
           onChange={onChange}
           defaultChecked={defaultChecked}
         />
         <div
           className={clsx(
-            "h-4 w-7 rounded-full  after:absolute after:top-[2px] after:left-[2px] after:h-3 after:w-3 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-['']",
+            "h-4 w-7 rounded-full after:absolute after:top-[2px] after:left-[2px] after:h-3 after:w-3 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-['']",
             "peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800",
             { "bg-gray-200": initialColor === "gray" },
             { "bg-green-600": initialColor === "green" },
