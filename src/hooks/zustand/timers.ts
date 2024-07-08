@@ -5,6 +5,10 @@ import { persist } from "zustand/middleware";
 import { Timer } from "../../types/timer";
 import { useEffect } from "react";
 
+interface TimerState {
+  timers: Timer[];
+}
+
 const zustandTimersStore = create(
   persist(
     (set, get) => ({
@@ -22,7 +26,9 @@ const zustandTimersStore = create(
           ),
         })),
       getTimer(timerId: string) {
-        return get().timers.find((timer: Timer) => timer.id === timerId);
+        return (get() as TimerState).timers.find(
+          (timer: Timer) => timer.id === timerId
+        );
       },
       delTimer: (timerId: string) =>
         set((state: { timers: Timer[] }) => ({
