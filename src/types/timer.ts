@@ -22,7 +22,7 @@ export type Timer = {
   isLarge: boolean;
   bgColor: string;
   pageColor: string;
-  timerColor: string;
+  timeColor: string;
   textColor: string;
   pauseColor: string;
 };
