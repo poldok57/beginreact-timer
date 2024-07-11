@@ -12,9 +12,14 @@ import {
   Shrink,
   Timer as LucideTimer,
   Palette,
+  MessageSquareOff,
 } from "lucide-react";
 import clsx from "clsx";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "../components/atom/Dialog";
 import { CountdownTimer } from "../components/timer/CountdownTimer";
 import { formatDuration } from "../lib/timer/formatDuration";
 import { sendNotification } from "../lib/timer/sendNotification";
@@ -28,7 +33,7 @@ interface TimerDisplayProps {
 
 export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
   const { delTimer, getTimer, updateTimer } = useTimersStore();
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setEditing] = useState(false);
   const [dateNow, setDateNow] = useState(Date.now());
 
   const [showInputColor, setShowInputColor] = useState(false);
@@ -73,7 +78,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
 
     const interval = setInterval(() => {
       setDateNow(Date.now());
-      console.log("Timer:", timer.title, "time left:", timer.timeLeft / 1000);
+      // console.log("Timer:", timer.title, "time left:", timer.timeLeft / 1000);
 
       if (timer.timeLeft <= 0 && timer.isRunning) {
         timer.isPaused = true;
@@ -104,20 +109,50 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
             <button className="btn btn-square btn-sm  opacity-10 group-hover:opacity-100">
               <Palette
                 size={16}
-                onClick={() => setShowInputColor(!showInputColor)}
+                onClick={() => {
+                  setShowInputColor(!showInputColor);
+                  setEditing(false);
+                }}
               />
             </button>
             <button
               onClick={() => toggleMinimized()}
-              className=" btn btn-square btn-sm  opacity-10 group-hover:opacity-100"
+              className="btn btn-square btn-sm  opacity-10 group-hover:opacity-100"
             >
               {timer.isMinimized ? <LucideTimer /> : <PanelBottom size={16} />}
             </button>
           </>
         ) : null}
-        <button className="btn btn-square btn-sm  opacity-10 group-hover:opacity-100">
-          <X onClick={() => delTimer(timer.id)} size={16} />
-        </button>
+        <div className="w-8">
+          <Dialog>
+            <DialogTrigger
+              type="open"
+              className="btn btn-square btn-sm opacity-10 group-hover:opacity-100"
+            >
+              <X size={16} />
+            </DialogTrigger>
+            <DialogContent
+              position="over"
+              blur={false}
+              className="w-fit border border-base-300 bg-base-200 p-2 m-1 gap-2 rounded"
+            >
+              <div>
+                <button
+                  className="btn btn-square btn-sm  opacity-10 group-hover:opacity-100"
+                  onClick={() => delTimer(timer.id)}
+                >
+                  <X size={16} />
+                </button>
+                <DialogTrigger
+                  type="close"
+                  className="btn btn-square btn-sm opacity-10 group-hover:opacity-100"
+                >
+                  <MessageSquareOff size={16} />
+                </DialogTrigger>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
       {timer.isMinimized ? (
         <div
@@ -141,39 +176,51 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
       ) : (
         <div className="card-body items-center p-2">
           {showInputColor && (
-            <TimerInputColor
-              timer={timer}
-              setColor={setColor}
-              onClose={() => setShowInputColor(false)}
-            />
+            <div className="absolute -translate-y-10">
+              <TimerInputColor
+                timer={timer}
+                setColor={setColor}
+                withLabel={false}
+                onClose={() => setShowInputColor(false)}
+              />
+            </div>
           )}
           {isEditing ? (
-            <TimerInputName
-              timerName={timer.title}
-              focus={true}
-              onChange={(newName) => {
-                timer.title = newName;
-                updateTimer(timer.id, timer);
+            <div className="absolute -translate-y-10">
+              <TimerInputName
+                timerName={timer.title}
+                focus={true}
+                onChange={(newName) => {
+                  timer.title = newName;
+                  updateTimer(timer.id, timer);
+                }}
+                onClose={() => setEditing(false)}
+                handleValide={() => setEditing(false)}
+              />
+            </div>
+          ) : null}
+          <h2 className="card-title w-full">
+            <div
+              className={clsx(
+                "flex flex-row w-full cursor-pointer items-center border-neutral",
+                {
+                  "text-lg justify-start": !timer.isLarge,
+                  "text-xl justify-center": timer.isLarge,
+                }
+              )}
+              style={{ color: timer.textColor }}
+              onClick={() => {
+                setEditing(true);
+                setShowInputColor(false);
               }}
-              handleValide={() => setIsEditing(false)}
-            />
-          ) : (
-            <h2 className="card-title w-full">
-              <div
-                className="flex flex-row cursor-pointer items-center text-left justify-start gap-1"
-                style={{ color: timer.textColor }}
-                onClick={() => setIsEditing(true)}
-              >
-                <LucideTimer size={20} />{" "}
-                {timer.title ? timer.title : "Timer Display"}
-              </div>
-            </h2>
-          )}
+            >
+              <LucideTimer size={20} />{" "}
+              {timer.title ? timer.title : "Timer Display"}
+            </div>
+          </h2>
           <CountdownTimer
-            baseColor="#ddd"
-            remainingColor="#f00"
             bgColor={timer.bgColor}
-            timeColor={timer.timerColor}
+            timeColor={timer.timeColor}
             pauseColor={timer.pauseColor}
             textColor={timer.textColor}
             diameter={timer.isLarge ? Math.min(maxDiameter, 600) : 200}
@@ -181,23 +228,23 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
             endTime={timerEnd}
             remainingTime={Math.max(timer.timeLeft, 0) / 1000}
             isPaused={timer.isPaused}
-            strokeWidth={timer.isLarge ? 12 : 6}
           />
           <div className="absolute bottom-1 left-1  opacity-0 group-hover:opacity-90">
             <button className="btn btn-xs" onClick={() => toggleLarge()}>
               {timer.isLarge ? <Shrink size={20} /> : <Expand size={20} />}
             </button>
           </div>
-          <div className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-90">
-            {timer.timeLeft <= 0 ? (
+          <div className="absolute bottom-1 right-1 opacity-0 flex gap-1 group-hover:opacity-90">
+            {timer.timeLeft <= 0 || timer.isPaused ? (
               <button className="btn btn-xs" onClick={() => restartTimer()}>
                 <RotateCcw size={20} />
               </button>
-            ) : (
+            ) : null}
+            {timer.timeLeft > 0 ? (
               <button className="btn btn-xs" onClick={() => togglePaused()}>
                 {timer.isPaused ? <Play size={20} /> : <Pause size={20} />}
               </button>
-            )}
+            ) : null}
           </div>
         </div>
       )}

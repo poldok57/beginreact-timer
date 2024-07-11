@@ -46,7 +46,6 @@ const zustandTimersStore = create(
               if (timer.isPaused) {
                 // Timer is paused, update the endAt value
                 const endAt = currentTime + timer.timeLeft;
-                console.log("timer paused: endAt", endAt);
                 return { ...timer, endAt };
               }
               const timeLeft = timer.endAt - currentTime;

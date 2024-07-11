@@ -88,6 +88,7 @@ export const filesetVariants = cva(
       },
       flex: {
         row: "flex flex-row items-center justify-between gap-2",
+        rowNoGap: "flex flex-row items-center justify-between",
         col: "flex flex-col",
       },
     },

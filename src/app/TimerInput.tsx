@@ -9,7 +9,9 @@ import { useTimersStore } from "../hooks/zustand/timers";
 import { filesetVariants } from "../style/form-variants";
 import { TimerInputName } from "./TimerInputName";
 import { TimerInputColor } from "./TimerInputColor";
+import { TimerTemplate } from "./TimerTemplate";
 import { PanelBottom } from "lucide-react";
+import { myThemeColors } from "../../tailwind.config";
 
 type Time = {
   h: string;
@@ -67,14 +69,15 @@ export const TimerInput = () => {
     setTime(controleTime(newTime));
   };
   const { addTimer } = useTimersStore();
+  const myBgColor = myThemeColors["base-200"];
   const [timerData, setTimerData] = useState({
     isRunning: true,
     isPaused: false,
     isMinimized: false,
     title: "",
-    bgColor: "base-200",
-    pageColor: "base-100",
-    timerColor: "#fa4",
+    bgColor: myThemeColors["base-200"],
+    pageColor: myThemeColors["base-100"],
+    timeColor: "#fa4",
     textColor: "#eee",
     pauseColor: "#f22",
   });
@@ -160,7 +163,8 @@ export const TimerInput = () => {
                 onChange={setTimerName}
                 handleValide={() => {}}
               />
-              <TimerInputColor timer={timerData} setColor={setColor} />
+              <TimerTemplate timer={timerData} setTimerData={setTimerData} />
+              {/* <TimerInputColor timer={timerData} setColor={setColor} /> */}
             </div>
           </div>
           <div class="card-actions flex flex-row justify-between px-4 pb-4 gap-4">

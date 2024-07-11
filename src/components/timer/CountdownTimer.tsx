@@ -2,29 +2,27 @@ import React from "react";
 import { formatDuration } from "../../lib/timer/formatDuration";
 
 interface CountdownTimerProps {
-  baseColor: string;
-  remainingColor: string;
+  baseColor?: string;
+  remainingColor?: string;
   bgColor?: string;
   diameter: number;
-  totalDuration: number;
   endTime: string;
-  remainingTime: number;
-  isPaused: boolean;
-  strokeWidth?: number;
+  totalDuration?: number;
+  remainingTime?: number;
+  isPaused?: boolean;
   textColor?: string;
   pauseColor?: string;
   timeColor?: string;
 }
 
 export const CountdownTimer: React.FC<CountdownTimerProps> = ({
-  baseColor,
-  remainingColor,
+  baseColor = "#ddd",
+  remainingColor = "#f00",
   diameter,
-  totalDuration,
+  totalDuration = 15 * 60,
+  remainingTime = 15 * 60,
   endTime,
-  remainingTime,
-  isPaused,
-  strokeWidth = 10,
+  isPaused = false,
   bgColor = "transparent",
   textColor = "#eee",
   pauseColor = "#f22",
@@ -34,6 +32,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const fontSizeBig = remainingTime > 3600 ? radius * 0.48 : radius * 0.6;
   const fontSize1 = radius * 0.15;
   const fontSize2 = radius * 0.12;
+  const strokeWidth = Math.max(2, diameter / 50);
 
   const normalizedRadius = radius - strokeWidth / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
