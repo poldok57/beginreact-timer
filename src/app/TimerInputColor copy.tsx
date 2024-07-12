@@ -38,7 +38,7 @@ const DisplayColorPicker = ({
 
   return (
     <div
-      className="absolute flex flex-col items-center z-10  -translate-y-full w-fit gap-2 p-2 bg-white rounded-lg border border-base-200"
+      className="absolute flex flex-col items-center z-10  -translate-y-full w-fit gap-3 p-2 bg-white rounded-lg border border-base-200"
       ref={pickerRef}
       // onMouseLeave={() => closeColorPicker()}
     >
@@ -73,7 +73,6 @@ const DisplayColorPicker = ({
             onChange={(color) => setColor(fieldName, color.hex)}
           />
           <SliderPicker
-            className="w-11/12"
             color={color}
             disableAlpha={true}
             onChange={(color) => setColor(fieldName, color.hex)}

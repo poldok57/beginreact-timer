@@ -13,6 +13,7 @@ interface CountdownTimerProps {
   textColor?: string;
   pauseColor?: string;
   timeColor?: string;
+  style?: React.CSSProperties | null;
 }
 
 export const CountdownTimer: React.FC<CountdownTimerProps> = ({
@@ -27,6 +28,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   textColor = "#eee",
   pauseColor = "#f22",
   timeColor = "#fa4",
+  style = null,
 }) => {
   const radius = diameter / 2;
   const fontSizeBig = remainingTime > 3600 ? radius * 0.48 : radius * 0.6;
@@ -49,7 +51,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const startY = radius + ((radius * 3) / 4) * Math.sin(endAngle);
 
   return (
-    <svg height={diameter} width={diameter}>
+    <svg height={diameter} width={diameter} style={style}>
       <circle
         stroke={baseColor}
         fill={bgColor}

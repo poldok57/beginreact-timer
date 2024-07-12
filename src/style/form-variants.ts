@@ -72,7 +72,7 @@ export const incrementBtnVariants = cva(
 );
 
 export const filesetVariants = cva(
-  ["group input input-bordered my-2 h-fit rounded-md items-center bg-base-200"],
+  ["group input input-bordered my-2 h-fit rounded-md bg-base-200"],
   {
     variants: {
       theme: {
@@ -87,12 +87,18 @@ export const filesetVariants = cva(
         accent: "bg-accent",
       },
       flex: {
-        row: "flex flex-row items-center justify-between gap-2",
+        row: "flex flex-row justify-between gap-2",
         rowNoGap: "flex flex-row items-center justify-between",
         col: "flex flex-col",
       },
+      items: {
+        start: "items-start",
+        center: "items-center",
+        end: "items-end",
+        none: "",
+      },
     },
-    defaultVariants: { theme: "primary", bg: "base200" },
+    defaultVariants: { theme: "primary", bg: "base200", items: "center" },
   }
 );
 
