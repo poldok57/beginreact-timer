@@ -9,6 +9,11 @@ import { TimerList } from "./TimerList";
 
 export default function Home() {
   useEffect(() => {
+    if (!("Notification" in window)) {
+      console.log("This browser does not support desktop notification");
+      return;
+    }
+
     // Demander l'autorisation de notification lorsque le composant est monté pour la première fois
     if (Notification.permission === "default") {
       Notification.requestPermission().then((permission) => {

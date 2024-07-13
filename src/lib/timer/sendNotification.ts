@@ -8,7 +8,7 @@ export const sendNotification = ({
   icon = "/bell-ring.png",
   audio = "/ring.mp3",
 }) => {
-  if (Notification.permission === "granted") {
+  if ("Notification" in window && Notification.permission === "granted") {
     new Notification(title, {
       body,
       icon,

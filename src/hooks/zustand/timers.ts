@@ -1,9 +1,10 @@
 "use client";
+import { useEffect } from "react";
+
 import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { Timer } from "../../types/timer";
-import { useEffect } from "react";
 
 interface TimerState {
   timers: Timer[];
@@ -65,7 +66,7 @@ const zustandTimersStore = create(
     }),
     {
       name: "timer-storage", // unique name
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );
@@ -103,12 +104,20 @@ export const useAndStartTimers = () => {
   useEffect(() => {
     const timerId = startTimers();
 
-    const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-    const filteredTimers = timers.filter(
-      (timer: Timer) => timer !== null && timer.endAt > twentyFourHoursAgo
-    );
+    if (timers && timers.length > 0) {
+      const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      const filteredTimers = timers.filter(
+        (timer: Timer) => timer !== null && timer.endAt > twentyFourHoursAgo
+      );
 
-    setTimers(filteredTimers);
+      // console.log(
+      //   "Filtered timers:",
+      //   filteredTimers.length,
+      //   "out of",
+      //   timers.length
+      // );
+      // setTimers(filteredTimers);
+    }
 
     return () => {
       clearInterval(timerId);
