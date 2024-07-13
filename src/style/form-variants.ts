@@ -72,7 +72,7 @@ export const incrementBtnVariants = cva(
 );
 
 export const filesetVariants = cva(
-  ["group input input-bordered my-2 h-fit rounded-md bg-base-200"],
+  ["group input input-bordered my-2 rounded-md bg-base-200"],
   {
     variants: {
       theme: {
@@ -97,8 +97,19 @@ export const filesetVariants = cva(
         end: "items-end",
         none: "",
       },
+      h: {
+        "28": "h-28",
+        "32": "h-32",
+        "36": "h-36",
+        fit: "h-fit",
+      },
     },
-    defaultVariants: { theme: "primary", bg: "base200", items: "center" },
+    defaultVariants: {
+      theme: "primary",
+      bg: "base200",
+      items: "center",
+      h: "fit",
+    },
   }
 );
 

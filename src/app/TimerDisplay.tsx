@@ -101,7 +101,9 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
         "p-1 rounded-sm w-full z-1": timer.isMinimized,
         "bg-base-100 w-fit z-0": !timer.isMinimized,
       })}
-      style={{ backgroundColor: timer.pageColor }}
+      style={{
+        backgroundColor: timer.isMinimized ? timer.bgColor : timer.pageColor,
+      }}
     >
       <div className="absolute flex flex-row gap-1 right-1 top-1">
         {!timer.isMinimized ? (

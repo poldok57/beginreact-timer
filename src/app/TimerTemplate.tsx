@@ -17,6 +17,22 @@ type TimerColor = {
 
 const templates: TimerColor[] = [
   {
+    title: "Light",
+    pageColor: "#bbb",
+    bgColor: "#fff",
+    timeColor: "#111",
+    textColor: "#333",
+    pauseColor: "#f11",
+  },
+  {
+    title: "Dark",
+    pageColor: myThemeColors["base-200"],
+    bgColor: myThemeColors["base-100"],
+    textColor: myThemeColors.accent,
+    timeColor: myThemeColors["accent-content"],
+    pauseColor: myThemeColors["warning-content"],
+  },
+  {
     title: "Theme",
     pageColor: "transparent",
     bgColor: myThemeColors["base-200"],
@@ -24,22 +40,7 @@ const templates: TimerColor[] = [
     textColor: myThemeColors.secondary,
     pauseColor: myThemeColors["warning-content"],
   },
-  {
-    title: "Contrast",
-    pageColor: "transparent",
-    bgColor: myThemeColors["base-100"],
-    textColor: myThemeColors.accent,
-    timeColor: myThemeColors["accent-content"],
-    pauseColor: myThemeColors["warning-content"],
-  },
-  {
-    title: "White",
-    pageColor: "#bbb",
-    bgColor: "#fff",
-    timeColor: "#111",
-    textColor: "#333",
-    pauseColor: "#f11",
-  },
+
   {
     title: "Purple",
     pageColor: "transparent",
@@ -89,23 +90,34 @@ export const TimerTemplate: React.FC<TimerTemplateProps> = ({
           bg: "base100",
           flex: "row",
           items: "start",
-          className: "relative p-2 overflow-visible h-28",
+          h: "28",
+          className: "relative p-2 overflow-visible",
         })}
       >
         <legend className={lengendVariants({ size: "sm" })}>Template</legend>
-        {onClose && (
+        <div className="absolute flex -top-7 right-0 p-1 gap-1">
           <button
-            className="btn btn-sm border border-warning absolute -top-7 right-0 p-2"
-            onClick={onClose}
+            className="btn btn-sm border border-warning"
+            onClick={() => {
+              setShowInputColor(true);
+            }}
           >
-            <X size={16} />
+            <Palette size={18} />
           </button>
-        )}
+          {onClose && (
+            <button
+              className="btn btn-sm border border-warning"
+              onClick={onClose}
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
 
         {templates.map((template, index) => (
           <div
             className={clsx([
-              "cursor-pointer w-12 flex flex-col items-center p-1 gap-1 rounded-md",
+              "cursor-pointer w-12 h-fit flex flex-col items-center p-1 gap-1 rounded-md",
               "hover:overflow-visible hover:-translate-y-4",
             ])}
             style={{ backgroundColor: template.pageColor }}
@@ -124,14 +136,6 @@ export const TimerTemplate: React.FC<TimerTemplateProps> = ({
             />
           </div>
         ))}
-        <div>
-          <Palette
-            size={24}
-            onClick={() => {
-              setShowInputColor(true);
-            }}
-          />
-        </div>
       </fieldset>
     </>
   );

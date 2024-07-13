@@ -1,5 +1,6 @@
 import React from "react";
 import { formatDuration } from "../../lib/timer/formatDuration";
+import { AlarmClockCheck, Pause } from "lucide-react";
 
 interface CountdownTimerProps {
   baseColor?: string;
@@ -49,6 +50,14 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const endY = radius + normalizedRadius * Math.sin(endAngle);
   const startX = radius + ((radius * 3) / 4) * Math.cos(endAngle);
   const startY = radius + ((radius * 3) / 4) * Math.sin(endAngle);
+
+  const textPos = {
+    x: `${0.6 * radius}px`,
+    x2: `${0.8 * radius}px`,
+
+    y: `${0.47 * radius}px`,
+    y2: `${0.6 * radius}px`,
+  };
 
   return (
     <svg height={diameter} width={diameter} style={style}>
@@ -101,14 +110,23 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         {/* {remainingTime.toFixed(0)} */}
         {formatDuration(remainingTime)}
       </text>
-      <text
-        x="50%"
-        y="30%"
-        textAnchor="middle"
-        fontSize={fontSize1}
-        fill={textColor}
-      >
-        {remainingTime > 0 ? "End : " : "Ended : "}
+      {remainingTime > 0 && isPaused ? (
+        <Pause
+          size={fontSize1}
+          x={textPos.x}
+          y={textPos.y}
+          stroke={pauseColor}
+        />
+      ) : (
+        <AlarmClockCheck
+          size={fontSize1}
+          x={textPos.x}
+          y={textPos.y}
+          stroke={remainingTime > 0 ? textColor : "red"}
+        />
+      )}
+      ;
+      <text x={textPos.x2} y={textPos.y2} fontSize={fontSize1} fill={textColor}>
         {endTime}
       </text>
       {remainingTime <= 0 && (
