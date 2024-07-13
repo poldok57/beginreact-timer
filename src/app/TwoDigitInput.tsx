@@ -54,6 +54,7 @@ export const TwoDigitInput: React.FunctionComponent<any> = ({
         onChange={handleChange}
         className="w-24 p-2 text-6xl justify-center text-neutral font-semibold rounded-md group-hover:bg-accent"
         placeholder="00"
+        inputMode="numeric"
       />
       {children}
       <CircleMinus
