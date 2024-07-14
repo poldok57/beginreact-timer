@@ -7,6 +7,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { Timer } from "../../types/timer";
 
 interface TimerState {
+  maximize: string;
   timers: Timer[];
 }
 
@@ -14,6 +15,7 @@ const zustandTimersStore = create(
   persist(
     (set, get) => ({
       timers: [],
+      maximize: 0,
       setTimers(timers: Timer[]) {
         set({ timers });
       },
@@ -63,6 +65,7 @@ const zustandTimersStore = create(
         }, 1000);
         return intervalId;
       },
+      setMaximize: (maximize: number) => set({ maximize }),
     }),
     {
       name: "timer-storage", // unique name
@@ -79,12 +82,14 @@ export const useTimersStore = () => {
   return zustandTimersStore(
     useShallow((state: any) => ({
       timers: state.timers,
+      maximize: state.maximize,
       getTimer: state.getTimer,
       setTimers: state.setTimers,
       addTimer: state.addTimer,
       delTimer: state.delTimer,
       updateTimer: state.updateTimer,
       startTimers: state.startTimers,
+      setMaximize: state.setMaximize,
     }))
   );
 };
@@ -116,7 +121,7 @@ export const useAndStartTimers = () => {
       //   "out of",
       //   timers.length
       // );
-      // setTimers(filteredTimers);
+      setTimers(filteredTimers);
     }
 
     return () => {

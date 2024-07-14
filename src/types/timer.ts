@@ -7,7 +7,6 @@
  * @property {boolean} isRunning - Indicates if the timer is currently running.
  * @property {boolean} isPaused - Indicates if the timer is NOT currently running.
  * @property {boolean} isMinimized - Indicates if the timer is minimized.
- * @property {boolean} isLarge - Indicates if the timer is large.
  * @property {string} title - The name of the timer.
  */
 export type Timer = {
@@ -19,7 +18,6 @@ export type Timer = {
   isRunning: boolean;
   isPaused: boolean;
   isMinimized: boolean;
-  isLarge: boolean;
   bgColor: string;
   pageColor: string;
   timeColor: string;

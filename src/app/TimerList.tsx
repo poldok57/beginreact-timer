@@ -5,7 +5,7 @@ import { TimerDisplay } from "./TimerDisplay";
 import { Timer } from "../types/timer";
 
 export const TimerList = () => {
-  const { timers, setTimers } = useTimersStore();
+  const { timers, maximize, setTimers } = useTimersStore();
   const now = Date.now();
 
   const ref = useRef<HTMLDivElement>(null);
@@ -19,13 +19,19 @@ export const TimerList = () => {
     return null; // ou un loader si nécessaire
   }
 
+  const maximizedTimer =
+    timers && timers.length && maximize
+      ? timers.find((timer: Timer) => timer.id === maximize)
+      : null;
+
+  const minimizedTimers =
+    timers && timers.filter((timer: Timer) => timer.isMinimized);
+
   return (
     <div className="max-w-fit justify-center">
-      {timers.length &&
-      timers.filter((timer: Timer) => timer.isMinimized).length > 0 ? (
+      {minimizedTimers && minimizedTimers.length ? (
         <div ref={ref} className="fixed items-center bottom-0 left-0 w-48">
-          {timers
-            .filter((timer: Timer) => timer.isMinimized)
+          {minimizedTimers
             .sort((a: Timer, b: Timer) => {
               const remainingTimeA = a.endAt - now;
               const remainingTimeB = b.endAt - now;
@@ -40,22 +46,15 @@ export const TimerList = () => {
               </div>
             ))}
         </div>
-      ) : (
-        <></>
-      )}
-      {timers.filter((timer: Timer) => timer.isLarge).length > 0 ? (
+      ) : null}
+      {maximizedTimer ? (
         <div
           ref={ref}
           className="flex flex-col items-center mx-auto w-fit mb-2"
         >
-          {timers
-            .filter((timer: Timer) => timer.isLarge)
-            .sort((a: Timer, b: Timer) => b.endAt - a.endAt)
-            .map((timer: Timer) => (
-              <div key={timer.id} className="flex flex-col items-center">
-                <TimerDisplay timer={timer} />
-              </div>
-            ))}
+          <div key={maximizedTimer.id} className="flex flex-col items-center">
+            <TimerDisplay timer={maximizedTimer} />
+          </div>
         </div>
       ) : (
         <></>
@@ -66,7 +65,9 @@ export const TimerList = () => {
         className="grid grid-cols-1 gap-2 lg:gap-4 md:grid-cols-2 lg:grid-cols-3"
       >
         {timers
-          .filter((timer: Timer) => !(timer.isMinimized || timer.isLarge))
+          .filter(
+            (timer: Timer) => !(timer.isMinimized || timer.id === maximize)
+          )
           .map((timer: Timer) => (
             <div key={timer.id} className="flex flex-col items-center">
               <TimerDisplay timer={timer} />
