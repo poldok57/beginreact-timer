@@ -26,9 +26,12 @@ export default function Home() {
 
   useAndStartTimers();
 
+  const { minimizedInput } = useTimersStore();
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-8 lg:p-12">
-      <TimerInput />
+      {minimizedInput ? null : <TimerInput />}
+
       {/* <TimerInputWP
         locked={false}
         titleBar={true}

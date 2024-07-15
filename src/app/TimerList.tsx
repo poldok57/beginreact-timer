@@ -3,9 +3,11 @@ import React, { useRef, useEffect, useState, use } from "react";
 import { useTimersStore } from "../hooks/zustand/timers";
 import { TimerDisplay } from "./TimerDisplay";
 import { Timer } from "../types/timer";
+import { Timer as LucideTimer } from "lucide-react";
 
 export const TimerList = () => {
-  const { timers, maximize, setTimers } = useTimersStore();
+  const { timers, maximize, minimizedInput, setMinimizedInput } =
+    useTimersStore();
   const now = Date.now();
 
   const ref = useRef<HTMLDivElement>(null);
@@ -29,13 +31,25 @@ export const TimerList = () => {
 
   return (
     <div className="max-w-fit justify-center">
-      {minimizedTimers && minimizedTimers.length ? (
-        <div ref={ref} className="fixed items-center bottom-0 left-0 w-48">
+      {minimizedInput || (minimizedTimers && minimizedTimers.length) ? (
+        <div ref={ref} className="fixed items-center bottom-0   left-0 w-48">
+          {minimizedInput ? (
+            <div className="flex flex-col items-center text-success-content p-1">
+              <button
+                className="btn btn-success btn-lg w-full"
+                onClick={() => setMinimizedInput(false)}
+              >
+                <LucideTimer size={24} />
+                Add a timer
+              </button>
+            </div>
+          ) : null}
           {minimizedTimers
             .sort((a: Timer, b: Timer) => {
               const remainingTimeA = a.endAt - now;
               const remainingTimeB = b.endAt - now;
-              if (remainingTimeA < 0 && remainingTimeB < 0) return 0; // Les deux timers sont passés, ne change pas l'ordre
+              if (remainingTimeA < 0 && remainingTimeB < 0)
+                return a.duration - b.duration; // Les deux timers sont passés, ne change pas l'ordre
               if (remainingTimeA < 0) return 1; // A est passé, B vient en premier
               if (remainingTimeB < 0) return -1; // B est passé, A vient en premier
               return remainingTimeA - remainingTimeB; // Compare par temps restant

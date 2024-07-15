@@ -59,12 +59,11 @@ export const TimerInput = () => {
   const ref = useRef(null);
   const [time, setTime] = useState({ h: "00", m: "01", s: "00" } as Time);
   const [timerName, setTimerName] = useState("");
-  const [isMinimized, setIsMinimized] = useState(false);
   const [showInputColor, setShowInputColor] = useState<boolean>(false);
   const [showTemplate, setShowTemplate] = useState<boolean>(false);
   const [templateName, setTemplateName] = useState<string>("");
   const toggleMinimize = () => {
-    setIsMinimized(!isMinimized);
+    setMinimizedInput(true);
   };
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,7 +71,7 @@ export const TimerInput = () => {
 
     setTime(controleTime(newTime));
   };
-  const { addTimer } = useTimersStore();
+  const { addTimer, setMinimizedInput, minimizedInput } = useTimersStore();
   const myBgColor = myThemeColors["base-200"];
   const [timerData, setTimerData] = useState({
     isRunning: true,
@@ -118,142 +117,133 @@ export const TimerInput = () => {
         <PanelBottom size={16} />
       </button>
 
-      <div
-        class="card-title text-xl justify-center text-neutral p-2"
-        onClick={() => {
-          if (isMinimized) setIsMinimized(false);
-        }}
-      >
+      <div class="card-title text-xl justify-center text-neutral p-2">
         Timer
       </div>
-      {!isMinimized ? (
-        <>
-          <div class="card-body p-2">
-            <div className="flex flex-col">
-              <fieldset
-                ref={ref}
-                className={filesetVariants({
-                  bg: "base200",
-                  className: "items-center",
-                })}
+      <div class="card-body p-2">
+        <div className="flex flex-col">
+          <fieldset
+            ref={ref}
+            className={filesetVariants({
+              bg: "base200",
+              className: "items-center",
+            })}
+          >
+            <legend className={lengendVariants({ size: "sm" })}>
+              Timer duration
+            </legend>
+            <div className="flex flex-row mx-auto justify-center">
+              <TwoDigitInput
+                fieldName="h"
+                value={time.h}
+                cut={3}
+                onChange={handleInputChange}
               >
-                <legend className={lengendVariants({ size: "sm" })}>
-                  Timer duration
-                </legend>
-                <div className="flex flex-row mx-auto justify-center">
-                  <TwoDigitInput
-                    fieldName="h"
-                    value={time.h}
-                    cut={3}
-                    onChange={handleInputChange}
-                  >
-                    :
-                  </TwoDigitInput>
-                  <TwoDigitInput
-                    fieldName="m"
-                    value={time.m}
-                    cut={3}
-                    onChange={handleInputChange}
-                  >
-                    :
-                  </TwoDigitInput>
-                  <TwoDigitInput
-                    fieldName="s"
-                    value={time.s}
-                    cut={3}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </fieldset>
-              <TimerInputName
-                timerName={timerName}
-                onChange={setTimerName}
-                handleValide={() => {}}
+                :
+              </TwoDigitInput>
+              <TwoDigitInput
+                fieldName="m"
+                value={time.m}
+                cut={3}
+                onChange={handleInputChange}
+              >
+                :
+              </TwoDigitInput>
+              <TwoDigitInput
+                fieldName="s"
+                value={time.s}
+                cut={3}
+                onChange={handleInputChange}
               />
-              {showTemplate ? (
-                <TimerTemplate
-                  timer={timerData}
-                  setTimerData={setTimerData}
-                  setShowInputColor={setShowInputColor}
-                  setShowTemplate={setShowTemplate}
-                  setTemplateName={setTemplateName}
-                  onClose={() => setShowTemplate(false)}
-                />
-              ) : (
-                <div className="flex flex-row gap-1 justify-between w-full">
-                  <button
-                    className={buttonVariants({
-                      variant: "neutral",
-                      size: "lg",
-                      className: "px-4",
-                    })}
-                    onClick={() => setShowTemplate(true)}
-                  >
-                    {!templateName ? (
-                      "Choose a template"
-                    ) : (
-                      <>
-                        Template
-                        <div
-                          className="items-center flex flex-col w-fit text-xs font-normal rounded"
-                          style={{
-                            backgroundColor: timerData.pageColor,
-                            color: timerData.timeColor,
-                          }}
-                        >
-                          {templateName}
-                          <CountdownTimer
-                            diameter={30}
-                            endTime="template"
-                            {...timerData}
-                          />
-                        </div>
-                      </>
-                    )}
-                  </button>
-                  <button
-                    className={buttonVariants({
-                      variant: "neutral",
-                      size: "lg",
-                      className: "px-6",
-                    })}
-                    onClick={() => {
-                      setShowInputColor(true);
-                    }}
-                  >
-                    <Palette size={24} />
-                  </button>
-                </div>
-              )}
-
-              {showInputColor ? (
-                <TimerInputColor
-                  timer={timerData}
-                  setColor={setColor}
-                  onClose={() => setShowInputColor(false)}
-                />
-              ) : null}
             </div>
-          </div>
-          <div class="card-actions flex flex-row justify-between px-4 pb-4 gap-4">
-            <button
-              className={buttonVariants({ variant: "warning", size: "sm" })}
-              onClick={() => {
-                setTime({ h: "00", m: "00", s: "00" });
-                setTimerName("");
-              }}
-            >
-              Reset
-            </button>
-            <button
-              className={buttonVariants({ variant: "success", size: "sm" })}
-              onClick={() => saveTimer()}
-            >
-              Add timer
-            </button>
-          </div>
-        </>
-      ) : null}
+          </fieldset>
+          <TimerInputName
+            timerName={timerName}
+            onChange={setTimerName}
+            handleValide={() => {}}
+          />
+          {showTemplate ? (
+            <TimerTemplate
+              timer={timerData}
+              setTimerData={setTimerData}
+              setShowInputColor={setShowInputColor}
+              setShowTemplate={setShowTemplate}
+              setTemplateName={setTemplateName}
+              onClose={() => setShowTemplate(false)}
+            />
+          ) : (
+            <div className="flex flex-row gap-1 justify-between w-full">
+              <button
+                className={buttonVariants({
+                  variant: "neutral",
+                  size: "lg",
+                  className: "px-4",
+                })}
+                onClick={() => setShowTemplate(true)}
+              >
+                {!templateName ? (
+                  "Choose a template"
+                ) : (
+                  <>
+                    Template
+                    <div
+                      className="items-center flex flex-col w-fit text-xs font-normal rounded"
+                      style={{
+                        backgroundColor: timerData.pageColor,
+                        color: timerData.timeColor,
+                      }}
+                    >
+                      {templateName}
+                      <CountdownTimer
+                        diameter={30}
+                        endTime="template"
+                        {...timerData}
+                      />
+                    </div>
+                  </>
+                )}
+              </button>
+              <button
+                className={buttonVariants({
+                  variant: "neutral",
+                  size: "lg",
+                  className: "px-6",
+                })}
+                onClick={() => {
+                  setShowInputColor(true);
+                }}
+              >
+                <Palette size={24} />
+              </button>
+            </div>
+          )}
+
+          {showInputColor ? (
+            <TimerInputColor
+              timer={timerData}
+              setColor={setColor}
+              onClose={() => setShowInputColor(false)}
+            />
+          ) : null}
+        </div>
+      </div>
+      <div class="card-actions flex flex-row justify-between px-4 pb-4 gap-4">
+        <button
+          className={buttonVariants({ variant: "warning", size: "sm" })}
+          onClick={() => {
+            setTime({ h: "00", m: "00", s: "00" });
+            setTimerName("");
+          }}
+        >
+          Reset
+        </button>
+        <button
+          className={buttonVariants({ variant: "success", size: "sm" })}
+          onClick={() => saveTimer()}
+        >
+          Add timer
+        </button>
+      </div>
     </div>
   );
 };

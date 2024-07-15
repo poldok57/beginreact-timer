@@ -8,6 +8,7 @@ import { Timer } from "../../types/timer";
 
 interface TimerState {
   maximize: string;
+  minimizedInput: boolean;
   timers: Timer[];
 }
 
@@ -16,6 +17,7 @@ const zustandTimersStore = create(
     (set, get) => ({
       timers: [],
       maximize: 0,
+      minimizedInput: false,
       setTimers(timers: Timer[]) {
         set({ timers });
       },
@@ -66,6 +68,7 @@ const zustandTimersStore = create(
         return intervalId;
       },
       setMaximize: (maximize: number) => set({ maximize }),
+      setMinimizedInput: (minimizedInput: boolean) => set({ minimizedInput }),
     }),
     {
       name: "timer-storage", // unique name
@@ -83,6 +86,7 @@ export const useTimersStore = () => {
     useShallow((state: any) => ({
       timers: state.timers,
       maximize: state.maximize,
+      minimizedInput: state.minimizedInput,
       getTimer: state.getTimer,
       setTimers: state.setTimers,
       addTimer: state.addTimer,
@@ -90,6 +94,7 @@ export const useTimersStore = () => {
       updateTimer: state.updateTimer,
       startTimers: state.startTimers,
       setMaximize: state.setMaximize,
+      setMinimizedInput: state.setMinimizedInput,
     }))
   );
 };
