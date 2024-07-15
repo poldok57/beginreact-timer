@@ -1,6 +1,6 @@
 import React from "react";
-import { formatDuration } from "../../lib/timer/formatDuration";
-import { AlarmClockCheck, Pause } from "lucide-react";
+import { formatDuration, formatTime } from "../../lib/timer/formatDuration";
+import { AlarmClockCheck, Bell, Pause } from "lucide-react";
 
 interface CountdownTimerProps {
   baseColor?: string;
@@ -110,22 +110,25 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         {/* {remainingTime.toFixed(0)} */}
         {formatDuration(remainingTime)}
       </text>
-      {remainingTime > 0 && isPaused ? (
-        <Pause
-          size={fontSize1}
-          x={textPos.x}
-          y={textPos.y}
-          stroke={pauseColor}
-        />
-      ) : (
-        <AlarmClockCheck
-          size={fontSize1}
-          x={textPos.x}
-          y={textPos.y}
-          stroke={remainingTime > 0 ? textColor : "red"}
-        />
+      {endTime && (
+        <>
+          {remainingTime > 0 && isPaused ? (
+            <Pause
+              size={fontSize1}
+              x={textPos.x}
+              y={textPos.y}
+              stroke={pauseColor}
+            />
+          ) : (
+            <Bell
+              size={fontSize1}
+              x={textPos.x}
+              y={textPos.y}
+              stroke={remainingTime > 0 ? textColor : "red"}
+            />
+          )}
+        </>
       )}
-      ;
       <text x={textPos.x2} y={textPos.y2} fontSize={fontSize1} fill={textColor}>
         {endTime}
       </text>
@@ -137,7 +140,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           fontSize={fontSize2}
           fill={pauseColor}
         >
-          timer ({formatDuration(totalDuration)}) elapsed
+          timer ({formatTime(totalDuration)}) elapsed
         </text>
       )}
       {remainingTime > 0 && isPaused && (
@@ -159,7 +162,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           fontSize={fontSize2}
           fill={pauseColor}
         >
-          Total: {formatDuration(totalDuration)}
+          {formatTime(totalDuration)}
         </text>
       )}
     </svg>

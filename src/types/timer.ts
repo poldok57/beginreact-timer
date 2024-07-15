@@ -16,6 +16,7 @@ export type Timer = {
   endAt: number;
   title: string;
   isRunning: boolean;
+  autoRestart: boolean;
   isPaused: boolean;
   isMinimized: boolean;
   bgColor: string;

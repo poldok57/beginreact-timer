@@ -21,13 +21,19 @@ export const TimerList = () => {
     return null; // ou un loader si nécessaire
   }
 
+  // console.log("timers", timers);
+
   const maximizedTimer =
     timers && timers.length && maximize
-      ? timers.find((timer: Timer) => timer.id === maximize)
+      ? timers.find((timer: Timer) => timer && timer.id === maximize)
       : null;
 
   const minimizedTimers =
-    timers && timers.filter((timer: Timer) => timer.isMinimized);
+    timers && timers.filter((timer: Timer) => timer && timer.isMinimized);
+
+  const otherTimers = timers.filter(
+    (timer: Timer) => timer && !timer.isMinimized && timer.id !== maximize
+  );
 
   return (
     <div className="max-w-fit justify-center">
@@ -78,15 +84,11 @@ export const TimerList = () => {
         ref={ref}
         className="grid grid-cols-1 gap-2 lg:gap-4 md:grid-cols-2 lg:grid-cols-3"
       >
-        {timers
-          .filter(
-            (timer: Timer) => !(timer.isMinimized || timer.id === maximize)
-          )
-          .map((timer: Timer) => (
-            <div key={timer.id} className="flex flex-col items-center">
-              <TimerDisplay timer={timer} />
-            </div>
-          ))}
+        {otherTimers.map((timer: Timer) => (
+          <div key={timer.id} className="flex flex-col items-center">
+            <TimerDisplay timer={timer} />
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -19,12 +19,23 @@ export const TimerInputName: React.FC<TimerInputNameProps> = ({
   focus = false,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const pickerRef = useRef<HTMLDivElement>(null);
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleValide();
     }
   };
+  useEffect(() => {
+    if (!focus) return;
+    const timer = setInterval(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [focus]);
 
   return (
     <fieldset className={filesetVariants({ bg: "base200", flex: "row" })}>

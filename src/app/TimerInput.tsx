@@ -104,12 +104,13 @@ export const TimerInput = () => {
       title: timerName,
     };
     addTimer(newTimer);
+    setMinimizedInput(true);
   };
 
   useFocusTrap(ref);
 
   return (
-    <div class="card border rounded-md shadow-lg min-w-80 border-base-300 my-2">
+    <div className="fixed top-5 self-center z-[5] bg-base-100 card border rounded-md shadow-lg min-w-80 border-base-300 my-2">
       <button
         className="btn btn-xs absolute top-2 right-2"
         onClick={toggleMinimize}
@@ -117,10 +118,10 @@ export const TimerInput = () => {
         <PanelBottom size={16} />
       </button>
 
-      <div class="card-title text-xl justify-center text-neutral p-2">
+      <div className="card-title text-xl justify-center text-neutral p-2">
         Timer
       </div>
-      <div class="card-body p-2">
+      <div className="card-body p-2">
         <div className="flex flex-col">
           <fieldset
             ref={ref}
@@ -227,7 +228,7 @@ export const TimerInput = () => {
           ) : null}
         </div>
       </div>
-      <div class="card-actions flex flex-row justify-between px-4 pb-4 gap-4">
+      <div className="card-actions flex flex-row justify-between px-4 pb-4 gap-4">
         <button
           className={buttonVariants({ variant: "warning", size: "sm" })}
           onClick={() => {

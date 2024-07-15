@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
 
 import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
@@ -8,6 +8,7 @@ import { Timer } from "../../types/timer";
 
 interface TimerState {
   maximize: string;
+  lastEnded: string;
   minimizedInput: boolean;
   timers: Timer[];
 }
@@ -16,7 +17,8 @@ const zustandTimersStore = create(
   persist(
     (set, get) => ({
       timers: [],
-      maximize: 0,
+      maximize: "",
+      lastEnded: "",
       minimizedInput: false,
       setTimers(timers: Timer[]) {
         set({ timers });
@@ -32,12 +34,12 @@ const zustandTimersStore = create(
         })),
       getTimer(timerId: string) {
         return (get() as TimerState).timers.find(
-          (timer: Timer) => timer.id === timerId
+          (timer: Timer) => timer && timer.id === timerId
         );
       },
       delTimer: (timerId: string) =>
         set((state: { timers: Timer[] }) => ({
-          timers: state.timers.filter((timer) => timer.id !== timerId),
+          timers: state.timers.filter((timer) => timer && timer.id !== timerId),
         })),
       eraseList: () => set({ timers: [] }),
       startTimers: () => {
@@ -57,6 +59,7 @@ const zustandTimersStore = create(
               if (timeLeft <= 0) {
                 // Timer has ended
 
+                set({ lastEnded: timer.id });
                 return { ...timer, timeLeft: 0 };
               }
               return { ...timer, timeLeft };
@@ -67,7 +70,12 @@ const zustandTimersStore = create(
         }, 1000);
         return intervalId;
       },
-      setMaximize: (maximize: number) => set({ maximize }),
+      setMaximize: (maximize: string) => {
+        set({ maximize });
+        if (maximize) set({ minimizedInput: true });
+      },
+      setLastEnded: (lastEnded: string) => set({ lastEnded }),
+
       setMinimizedInput: (minimizedInput: boolean) => set({ minimizedInput }),
     }),
     {
@@ -86,6 +94,7 @@ export const useTimersStore = () => {
     useShallow((state: any) => ({
       timers: state.timers,
       maximize: state.maximize,
+      lastEnded: state.lastEnded,
       minimizedInput: state.minimizedInput,
       getTimer: state.getTimer,
       setTimers: state.setTimers,
@@ -94,6 +103,7 @@ export const useTimersStore = () => {
       updateTimer: state.updateTimer,
       startTimers: state.startTimers,
       setMaximize: state.setMaximize,
+      setLastEnded: state.setLastEnded,
       setMinimizedInput: state.setMinimizedInput,
     }))
   );
@@ -110,24 +120,25 @@ export const useAndStartTimers = () => {
       startTimers: state.startTimers,
     })
   );
-
   useEffect(() => {
-    const timerId = startTimers();
-
     if (timers && timers.length > 0) {
       const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
       const filteredTimers = timers.filter(
         (timer: Timer) => timer !== null && timer.endAt > twentyFourHoursAgo
       );
 
-      // console.log(
-      //   "Filtered timers:",
-      //   filteredTimers.length,
-      //   "out of",
-      //   timers.length
-      // );
-      setTimers(filteredTimers);
+      console.log(
+        "Filtered timers:",
+        filteredTimers.length,
+        "out of",
+        timers.length
+      );
+      if (filteredTimers.length !== timers.length) setTimers(filteredTimers);
     }
+  }, []);
+
+  useEffect(() => {
+    const timerId = startTimers();
 
     return () => {
       clearInterval(timerId);
