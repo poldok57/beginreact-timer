@@ -36,7 +36,7 @@ export const TimerList = () => {
   );
 
   return (
-    <div className="max-w-fit justify-center">
+    <div className="relative z-0 max-w-fit justify-center">
       {minimizedInput || (minimizedTimers && minimizedTimers.length) ? (
         <div ref={ref} className="fixed items-center bottom-0   left-0 w-48">
           {minimizedInput ? (
@@ -61,9 +61,7 @@ export const TimerList = () => {
               return remainingTimeA - remainingTimeB; // Compare par temps restant
             })
             .map((timer: Timer) => (
-              <div key={timer.id} className="flex flex-col items-center">
-                <TimerDisplay timer={timer} />
-              </div>
+              <TimerDisplay timer={timer} key={timer.id} />
             ))}
         </div>
       ) : null}
@@ -72,9 +70,7 @@ export const TimerList = () => {
           ref={ref}
           className="flex flex-col items-center mx-auto w-fit mb-2"
         >
-          <div key={maximizedTimer.id} className="flex flex-col items-center">
-            <TimerDisplay timer={maximizedTimer} />
-          </div>
+          <TimerDisplay timer={maximizedTimer} key={maximizedTimer.id} />
         </div>
       ) : (
         <></>
@@ -85,9 +81,7 @@ export const TimerList = () => {
         className="grid grid-cols-1 gap-2 lg:gap-4 md:grid-cols-2 lg:grid-cols-3"
       >
         {otherTimers.map((timer: Timer) => (
-          <div key={timer.id} className="flex flex-col items-center">
-            <TimerDisplay timer={timer} />
-          </div>
+          <TimerDisplay key={timer.id} timer={timer} />
         ))}
       </div>
     </div>

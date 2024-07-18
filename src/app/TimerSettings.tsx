@@ -1,11 +1,8 @@
 import React, { useRef, useEffect, useState, KeyboardEvent } from "react";
-import { filesetVariants, lengendVariants } from "../style/form-variants";
-import { hiddenBtnVariants } from "../style/form-variants";
 import { FieldLegend } from "./FieldLegend";
-import { X } from "lucide-react";
 import clsx from "clsx";
 
-interface TimerInputNameProps {
+interface TimerSettingsProps {
   timerName: string;
   onChange: (value: string) => void;
   onClose?: () => void;
@@ -13,7 +10,7 @@ interface TimerInputNameProps {
   focus?: boolean;
 }
 
-export const TimerInputName: React.FC<TimerInputNameProps> = ({
+export const TimerSettings: React.FC<TimerSettingsProps> = ({
   timerName,
   onChange,
   onClose = null,
@@ -26,6 +23,7 @@ export const TimerInputName: React.FC<TimerInputNameProps> = ({
       handleValide();
     }
   };
+
   useEffect(() => {
     if (!focus || !inputRef.current) return;
 
@@ -33,7 +31,13 @@ export const TimerInputName: React.FC<TimerInputNameProps> = ({
   }, [focus]);
 
   return (
-    <FieldLegend title="Timer name" onClose={onClose}>
+    <FieldLegend title="Settings" onClose={onClose}>
+      <div className="flex w-fit">
+        <label className="label cursor-pointer">
+          <span className="label-text">Auto restart</span>
+          <input type="checkbox" className="toggle toggle-primary" />
+        </label>
+      </div>
       <input
         ref={inputRef}
         className={clsx("rounded-md items-center", {

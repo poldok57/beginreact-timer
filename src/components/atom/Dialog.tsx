@@ -84,11 +84,12 @@ const useFocusTrap = (ref: RefObject<HTMLElement>, isEnabled: boolean) => {
   });
 };
 
-export const Dialog = ({ children }) => {
+export const Dialog = ({ children, blur = null }) => {
   const [open, setOpen] = useState(false);
+  const dialogRef = useRef(null);
 
   return (
-    <DialogContext.Provider value={{ open, setOpen }}>
+    <DialogContext.Provider value={{ open, blur, dialogRef, setOpen }}>
       {children}
     </DialogContext.Provider>
   );
@@ -117,14 +118,24 @@ export const DialogTrigger: React.FC<DialogTriggerProps> = ({
   className = null,
   type = "toggle",
 }: DialogTriggerProps) => {
-  const { setOpen } = useDialogContext();
+  const { setOpen, blur, dialogRef } = useDialogContext();
 
   const handleClick = () => {
     switch (type) {
       case "close":
+        if (dialogRef.current) {
+          dialogRef.current.close();
+        }
         setOpen(false);
         break;
       case "open":
+        if (dialogRef.current) {
+          if (blur) {
+            dialogRef.current.showModal();
+          } else {
+            dialogRef.current.show();
+          }
+        }
         setOpen(true);
         break;
       default: // toggle
@@ -189,21 +200,18 @@ interface DialogContentProps {
   className?: string | null;
   children: React.ReactNode;
   position?: "center" | "over" | "under";
-  blur?: boolean;
 }
 
 export const DialogContent: React.FC<DialogContentProps> = ({
   className = null,
   children,
   position = "center",
-  blur = true,
 }) => {
-  const { open, setOpen } = useDialogContext();
+  const { open, blur, dialogRef, setOpen } = useDialogContext();
   const ref = useRef(null);
 
   const handleClickOutside = (e) => {
     const element = ref.current;
-    // if ( ! element ) return false;
     if (element && !element.contains(e.target)) {
       setOpen(false);
     }
@@ -233,36 +241,22 @@ export const DialogContent: React.FC<DialogContentProps> = ({
 
   useFocusTrap(ref, open);
 
-  if (!open) return null;
-
-  // console.log("position", position);
-
   return (
-    <div
-      className={clsx({
-        "fixed inset-0 flex items-center justify-center": position === "center",
-      })}
-    >
-      {blur ? (
-        <div
-          className={clsx("fixed inset-0 bg-black/50  backdrop-blur-sm")}
-        ></div>
-      ) : null}
+    <dialog className={clsx({ modal: blur })} ref={dialogRef}>
       <div
-        ref={ref}
         className={clsx(
           "card shadow-xl animate-in fade-in-50",
           {
-            "relative z-10  -translate-x-5 -translate-y-full":
+            "relative z-10  translate-x-3/4 -translate-y-full":
               position === "over",
-            "relative z-10 -translate-x-5 my-1": position === "under",
+            "relative z-10  my-1": position === "under",
           },
           className
         )}
       >
         {className ? children : <div className="card-body">{children}</div>}
       </div>
-    </div>
+    </dialog>
   );
 };
 

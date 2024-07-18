@@ -22,12 +22,56 @@ export const buttonVariants = cva(
       size: {
         xs: "btn-xs",
         sm: "btn-sm",
-        md: "btn-md",
+        md: "",
         lg: "btn-lg",
-        xl: "btn-xl",
       },
     },
     defaultVariants: { variant: "default", size: "md" },
+  }
+);
+
+export const hiddenBtnVariants = cva(
+  [
+    "btn btn-square hover:border-neutral",
+    "transition-opacity duration-300  group-hover:opacity-100",
+  ],
+  {
+    variants: {
+      variant: {
+        square: "btn-square",
+        warning: "btn-warning",
+        primary: "btn-primary",
+        success: "btn-success",
+      },
+      opacity: {
+        "0": "opacity-0",
+        "10": "opacity-10",
+        "20": "opacity-20",
+        "30": "opacity-30",
+        "50": "opacity-50",
+        "60": "opacity-60",
+        "80": "opacity-80",
+      },
+      size: {
+        xs: "btn-xs",
+        sm: "btn-sm",
+        md: "",
+        lg: "btn-lg",
+      },
+      border: {
+        warning: "border border-warning",
+        primary: "border border-primary",
+        success: "border border-success",
+        neutral: "border border-base-300",
+        none: "",
+      },
+    },
+    defaultVariants: {
+      variant: "square",
+      size: "md",
+      opacity: "0",
+      border: "neutral",
+    },
   }
 );
 
@@ -41,8 +85,9 @@ export const incrementBtnVariants = cva(
       size: {
         xs: "text-xs",
         sm: "text-sm",
-        md: "text-md",
+        md: "text-base",
         lg: "text-lg",
+        xl: "text-xl",
       },
       pos: {
         top: "top-1",
@@ -72,7 +117,7 @@ export const incrementBtnVariants = cva(
 );
 
 export const filesetVariants = cva(
-  ["group input input-bordered my-2 rounded-md bg-base-200"],
+  ["group input input-bordered my-2 rounded-md bg-base-200,"],
   {
     variants: {
       theme: {
@@ -86,9 +131,14 @@ export const filesetVariants = cva(
         base300: "bg-base-300",
         accent: "bg-accent",
       },
+      position: {
+        relative: "relative",
+        absolute: "absolute",
+        none: "",
+      },
       flex: {
-        row: "flex flex-row justify-between gap-2",
-        rowNoGap: "flex flex-row items-center justify-between",
+        row: "flex flex-row justify-between gap-2 w-full",
+        rowNoGap: "flex flex-row items-center justify-between w-full",
         col: "flex flex-col",
       },
       items: {
@@ -109,6 +159,7 @@ export const filesetVariants = cva(
       bg: "base200",
       items: "center",
       h: "fit",
+      position: "relative",
     },
   }
 );

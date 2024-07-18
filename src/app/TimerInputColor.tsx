@@ -1,9 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
-import { filesetVariants, lengendVariants } from "../style/form-variants";
+import { FieldLegend } from "./FieldLegend";
+import { DialogClose } from "../components/atom/Dialog";
+import { CountdownTimer } from "../components/timer/CountdownTimer";
 import { myThemeColors } from "../../tailwind.config";
 import { GithubPicker, SliderPicker } from "react-color";
 import { Timer } from "../types/timer";
 import { X, Copy } from "lucide-react";
+import clsx from "clsx";
+import { hiddenBtnVariants } from "../style/form-variants";
 
 const themeColorsArray = ["#fff", "#000", ...Object.values(myThemeColors)];
 
@@ -17,35 +21,36 @@ const DisplayColorPicker = ({
   const pickerRef = useRef<HTMLDivElement>(null);
   const handleCopyColor = () => {
     navigator.clipboard.writeText(color);
-    console.log("Color copied to clipboard", color);
   };
+
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        pickerRef.current &&
-        !pickerRef.current.contains(event.target as Node)
-      ) {
+    let timerId = null;
+
+    if (!pickerRef.current) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
         closeColorPicker();
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+      if (timerId) clearTimeout(timerId);
     };
   }, []);
 
   return (
     <div
-      className="absolute flex flex-col items-center z-10  -translate-y-full w-fit gap-2 p-2 bg-white rounded-lg border border-base-200"
+      className="flex flex-col items-center z-20  w-fit gap-2 p-2 bg-white rounded-lg border border-base-200"
       ref={pickerRef}
-      // onMouseLeave={() => closeColorPicker()}
     >
       {label ? (
         <h3 className="flex justify-center text-lg font-bold">{label}</h3>
       ) : null}
-      <div className="form-control w-44">
+      <div className="form-control">
         <label htmlFor={fieldName} className="flex gap-2 items-center">
           <input
             id={fieldName}
@@ -78,10 +83,10 @@ const DisplayColorPicker = ({
             disableAlpha={true}
             onChange={(color) => setColor(fieldName, color.hex)}
           />
-          <div className="relative flex gap-2 items-center">
+          <div className="relative flex gap-2 items-center justify-center">
             <input
               type="text"
-              className="border  border-gray-300 w-11/12 m-2 focus:border-gray-800 p-3 rounded-md"
+              className="border border-gray-300 w-11/12 m-2focus:border-gray-800 p-3 rounded-md"
               value={color}
               onChange={(e) => setColor(fieldName, e.target.value)}
             />
@@ -104,7 +109,8 @@ interface InputColorProps {
   color: string;
   label?: string;
   withLabel?: boolean;
-  setColor: (fieldName: string, value: string) => void;
+  setPickerIsOpen?: (isOpen: boolean) => void;
+  onClick?: () => void;
 }
 
 export const InputColor: React.FC<InputColorProps> = ({
@@ -112,28 +118,27 @@ export const InputColor: React.FC<InputColorProps> = ({
   color,
   label = null,
   withLabel = true,
-  setColor,
+  setPickerIsOpen = null,
+  onClick = null,
 }) => {
-  const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
+  const handleClick = () => {
+    if (onClick) onClick();
+    if (setPickerIsOpen) setPickerIsOpen(true);
+  };
 
   return (
     <div>
       {withLabel && label && <label className="block text-sm">{label}</label>}
       <div
-        className="w-8 h-6 m-2 bg-gray-500 cursor-pointer border-4 border-gray-300 rounded-md"
+        className={clsx(
+          " bg-gray-500 cursor-pointer border-gray-300 rounded-md",
+          { "w-8 h-6 m-1 border-4": withLabel },
+          { "w-6 h-6 my-1 border-2": !withLabel }
+        )}
         style={{ backgroundColor: color }}
-        onClick={() => setShowColorPicker(true)}
+        onClick={() => handleClick()}
         title={label}
       ></div>
-      {showColorPicker && (
-        <DisplayColorPicker
-          setColor={setColor}
-          color={color}
-          fieldName={fieldName}
-          label={label}
-          closeColorPicker={() => setShowColorPicker(false)}
-        />
-      )}
     </div>
   );
 };
@@ -143,6 +148,8 @@ interface TimerInputColorProps {
   setColor: (fieldName: string, value: string) => void;
   onClose?: () => void | null;
   withLabel?: boolean;
+  withTemplate?: boolean;
+  closeOnOutsideClick?: boolean;
 }
 
 export const TimerInputColor: React.FC<TimerInputColorProps> = ({
@@ -150,64 +157,98 @@ export const TimerInputColor: React.FC<TimerInputColorProps> = ({
   setColor,
   onClose = null,
   withLabel = true,
+  withTemplate = false,
+  closeOnOutsideClick = false,
 }) => {
+  const pickerIsOpen = useRef(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [selectedField, setSelectedField] = useState<string | null>(null);
+
+  const handlePickerIsOpen = (isOpen: boolean) => {
+    setShowColorPicker(isOpen);
+    pickerIsOpen.current = isOpen;
+  };
+
+  useEffect(() => {
+    if (!ref.current || closeOnOutsideClick == false || onClose === null)
+      return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const colors = {
+    pageColor: "Page",
+    bgColor: "Back-gr.",
+    timeColor: "Timer",
+    textColor: "Text",
+    pauseColor: "Pause",
+  };
+
+  const selectedColor = selectedField ? timer[selectedField] : null;
+  const label = selectedField ? colors[selectedField] : null;
+
   return (
-    <fieldset
-      className={filesetVariants({
-        bg: "base200",
-        flex: "rowNoGap",
-        className: "relative",
+    <div
+      ref={ref}
+      className={clsx("flex flex-col justify-center items-center bg-base-100", {
+        "p-2": withTemplate,
       })}
     >
-      {onClose && (
-        <button
-          className="btn btn-sm border border-warning absolute -top-7 right-0 p-2"
-          onClick={onClose}
-        >
-          <X size={16} />
-        </button>
+      {withTemplate && (
+        <>
+          <DialogClose className="absolute top-1 right-4 p-2 z-20">
+            <button className={hiddenBtnVariants({ size: "sm" })}>
+              <X size={16} />
+            </button>
+          </DialogClose>
+          <div
+            className="card w-fit"
+            style={{ backgroundColor: timer.pageColor, color: timer.textColor }}
+          >
+            <h2 className="text-center">{timer.title}</h2>
+            <CountdownTimer
+              diameter={200}
+              endTime="template"
+              {...timer}
+              isPaused={true}
+            />
+          </div>
+        </>
       )}
-      <legend className={lengendVariants({ size: "sm" })}>Timer color</legend>
-      <InputColor
-        key="pageColor"
-        fieldName="pageColor"
-        color={timer.pageColor}
-        setColor={setColor}
-        label="Page"
-        withLabel={withLabel}
-      />
-      <InputColor
-        key="bgColor"
-        fieldName="bgColor"
-        color={timer.bgColor}
-        setColor={setColor}
-        label="Back-gr."
-        withLabel={withLabel}
-      />
-      <InputColor
-        key="timeColor"
-        fieldName="timeColor"
-        color={timer.timeColor}
-        setColor={setColor}
-        label="Timer"
-        withLabel={withLabel}
-      />
-      <InputColor
-        key="textColor"
-        fieldName="textColor"
-        color={timer.textColor}
-        setColor={setColor}
-        label="Text"
-        withLabel={withLabel}
-      />
-      <InputColor
-        key="pauseColor"
-        fieldName="pauseColor"
-        color={timer.pauseColor}
-        setColor={setColor}
-        label="Pause"
-        withLabel={withLabel}
-      />
-    </fieldset>
+      <FieldLegend title="Timer color" onClose={withTemplate ? null : onClose}>
+        {Object.entries(colors).map(([fieldName, label], idx) => (
+          <InputColor
+            key={idx}
+            fieldName={fieldName}
+            color={timer[fieldName]}
+            label={label}
+            withLabel={withLabel}
+            onClick={() => {
+              setSelectedField(fieldName);
+              handlePickerIsOpen(true);
+            }}
+          />
+        ))}
+      </FieldLegend>
+      {showColorPicker && selectedField !== null ? (
+        <DisplayColorPicker
+          setColor={setColor}
+          color={selectedColor}
+          fieldName={selectedField}
+          label={label}
+          closeColorPicker={() => handlePickerIsOpen(false)}
+        />
+      ) : null}
+    </div>
   );
 };

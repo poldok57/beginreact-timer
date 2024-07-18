@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Timer } from "../types/timer";
 import { CountdownTimer } from "../components/timer/CountdownTimer";
-import { X, Palette } from "lucide-react";
-import { filesetVariants, lengendVariants } from "../style/form-variants";
+import { FieldLegend } from "./FieldLegend";
+import { Palette } from "lucide-react";
 import { myThemeColors } from "../../tailwind.config";
+import { hiddenBtnVariants } from "../style/form-variants";
 import clsx from "clsx";
 
 type TimerColor = {
@@ -62,7 +63,7 @@ const templates: TimerColor[] = [
 interface TimerTemplateProps {
   timer: Timer;
   setTimerData: (timer: Timer) => void;
-  setShowInputColor: (show: boolean) => void;
+  toggleShowInputColor: () => void;
   setShowTemplate?: (show: boolean) => void;
   setTemplateName?: (name: string) => void;
   onClose?: () => void;
@@ -71,7 +72,7 @@ interface TimerTemplateProps {
 export const TimerTemplate: React.FC<TimerTemplateProps> = ({
   timer,
   setTimerData,
-  setShowInputColor,
+  toggleShowInputColor,
   setShowTemplate,
   setTemplateName,
   onClose = null,
@@ -84,59 +85,48 @@ export const TimerTemplate: React.FC<TimerTemplateProps> = ({
     setShowTemplate?.(false);
   };
   return (
-    <>
-      <fieldset
-        className={filesetVariants({
-          bg: "base100",
-          flex: "row",
-          items: "start",
-          h: "28",
-          className: "relative p-2 overflow-visible",
-        })}
-      >
-        <legend className={lengendVariants({ size: "sm" })}>Template</legend>
-        <div className="absolute flex -top-7 right-0 p-1 gap-1">
-          <button
-            className="btn btn-sm border border-warning"
-            onClick={() => {
-              setShowInputColor(true);
-            }}
-          >
-            <Palette size={18} />
-          </button>
-          {onClose && (
-            <button
-              className="btn btn-sm border border-warning"
-              onClick={onClose}
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-
-        {templates.map((template, index) => (
-          <div
-            className={clsx([
-              "cursor-pointer w-12 h-fit flex flex-col items-center p-1 gap-1 rounded-md",
-              "hover:overflow-visible hover:-translate-y-4",
-            ])}
-            style={{ backgroundColor: template.pageColor }}
-            key={index}
-            onClick={() => valideTemplate(template)}
-            onMouseOver={() => setHoveredIndex(index)}
-            onMouseOut={() => setHoveredIndex(null)}
-          >
-            <div className="text-xs" style={{ color: template.timeColor }}>
-              {template.title}
-            </div>
-            <CountdownTimer
-              diameter={hoveredIndex == index ? 92 : 40}
-              endTime="template"
-              {...template}
-            />
+    <FieldLegend
+      title="Templates"
+      height="28"
+      items="start"
+      addButton={
+        <button
+          className={hiddenBtnVariants({
+            size: "sm",
+            border: "warning",
+            opacity: "60",
+          })}
+          onClick={() => {
+            toggleShowInputColor();
+          }}
+        >
+          <Palette size={18} />
+        </button>
+      }
+      onClose={onClose}
+    >
+      {templates.map((template, index) => (
+        <div
+          className={clsx([
+            "cursor-pointer w-12 h-fit flex flex-col items-center p-1 gap-1 rounded-md",
+            "hover:overflow-visible hover:-translate-y-4",
+          ])}
+          style={{ backgroundColor: template.pageColor }}
+          key={index}
+          onClick={() => valideTemplate(template)}
+          onMouseOver={() => setHoveredIndex(index)}
+          onMouseOut={() => setHoveredIndex(null)}
+        >
+          <div className="text-xs" style={{ color: template.timeColor }}>
+            {template.title}
           </div>
-        ))}
-      </fieldset>
-    </>
+          <CountdownTimer
+            diameter={hoveredIndex == index ? 92 : 40}
+            endTime="template"
+            {...template}
+          />
+        </div>
+      ))}
+    </FieldLegend>
   );
 };

@@ -1,6 +1,6 @@
 // @ts-nocheck
 "use client";
-import { ChangeEvent, useState, useRef } from "react";
+import { ChangeEvent, useState, useRef, useEffect } from "react";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { buttonVariants, lengendVariants } from "../style/form-variants";
 import { TwoDigitInput } from "./TwoDigitInput";
@@ -10,9 +10,11 @@ import { filesetVariants } from "../style/form-variants";
 import { TimerInputName } from "./TimerInputName";
 import { TimerInputColor } from "./TimerInputColor";
 import { TimerTemplate } from "./TimerTemplate";
+import { TimerSettings } from "./TimerSettings";
 import { myThemeColors } from "../../tailwind.config";
 import { CountdownTimer } from "../components/timer/CountdownTimer";
-import { PanelBottom, Palette } from "lucide-react";
+import { hiddenBtnVariants } from "../style/form-variants";
+import { PanelBottom, Palette, Settings } from "lucide-react";
 
 type Time = {
   h: string;
@@ -56,11 +58,13 @@ const controleTime = (time: Time) => {
 };
 
 export const TimerInput = () => {
+  const mainRef = useRef(null);
   const ref = useRef(null);
   const [time, setTime] = useState({ h: "00", m: "01", s: "00" } as Time);
   const [timerName, setTimerName] = useState("");
   const [showInputColor, setShowInputColor] = useState<boolean>(false);
   const [showTemplate, setShowTemplate] = useState<boolean>(false);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
   const [templateName, setTemplateName] = useState<string>("");
   const toggleMinimize = () => {
     setMinimizedInput(true);
@@ -84,7 +88,12 @@ export const TimerInput = () => {
     textColor: "#eee",
     pauseColor: "#f22",
   });
-
+  const toggleShowInputColor = () => {
+    setShowInputColor(!showInputColor);
+  };
+  const toggleSettings = () => {
+    setShowSettings(!showSettings);
+  };
   const setColor = (fieldName: string, value: string) => {
     setTimerData({ ...timerData, [fieldName]: value });
   };
@@ -107,19 +116,49 @@ export const TimerInput = () => {
     setMinimizedInput(true);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Escape") {
+      setMinimizedInput(true);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener(" keydown", handleKeyDown);
+    };
+  }, []);
+
   useFocusTrap(ref);
 
   return (
-    <div className="fixed top-5 self-center z-[5] bg-base-100 card border rounded-md shadow-lg min-w-80 border-base-300 my-2">
-      <button
-        className="btn btn-xs absolute top-2 right-2"
-        onClick={toggleMinimize}
-      >
-        <PanelBottom size={16} />
-      </button>
-
-      <div className="card-title text-xl justify-center text-neutral p-2">
+    <div
+      ref={mainRef}
+      className="fixed top-5 self-center z-10 bg-base-100 card border rounded-md shadow-lg min-w-80 border-base-300 my-2"
+      tabIndex={0}
+    >
+      <div className="group card-title text-xl justify-center text-neutral p-1">
         Timer
+        <div className="flex absolute top-2 right-1 gap-4 md:gap-2">
+          {/* <button
+            className={hiddenBtnVariants({
+              size: "sm",
+              opacity: "70",
+            })}
+            onClick={toggleSettings}
+          >
+            <Settings size={18} />
+          </button> */}
+          <button
+            className={hiddenBtnVariants({
+              size: "sm",
+              opacity: "70",
+            })}
+            onClick={toggleMinimize}
+          >
+            <PanelBottom size={18} />
+          </button>
+        </div>
       </div>
       <div className="card-body p-2">
         <div className="flex flex-col">
@@ -158,6 +197,14 @@ export const TimerInput = () => {
               />
             </div>
           </fieldset>
+          {showSettings ? (
+            <TimerSettings
+              timerName={timerName}
+              onChange={setTimerName}
+              onClose={() => setShowSettings(false)}
+              handleValide={() => {}}
+            />
+          ) : null}
           <TimerInputName
             timerName={timerName}
             onChange={setTimerName}
@@ -167,7 +214,7 @@ export const TimerInput = () => {
             <TimerTemplate
               timer={timerData}
               setTimerData={setTimerData}
-              setShowInputColor={setShowInputColor}
+              toggleShowInputColor={toggleShowInputColor}
               setShowTemplate={setShowTemplate}
               setTemplateName={setTemplateName}
               onClose={() => setShowTemplate(false)}

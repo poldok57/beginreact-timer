@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useTimersStore } from "../hooks/zustand/timers";
 import { Timer } from "../types/timer";
 import {
@@ -28,22 +28,17 @@ import { sendNotification } from "../lib/timer/sendNotification";
 import { TimerInputName } from "./TimerInputName";
 import { TimerInputColor } from "./TimerInputColor";
 
+import { hiddenBtnVariants } from "../style/form-variants";
+
 interface TimerDisplayProps {
+  key: string;
   timer: Timer;
 }
 
-export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
-  const {
-    delTimer,
-    updateTimer,
-    maximize,
-    lastEnded,
-    setLastEnded,
-    setMaximize,
-  } = useTimersStore();
+export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
+  const { updateTimer, maximize, lastEnded, setLastEnded, setMaximize } =
+    useTimersStore();
   const [isEditing, setEditing] = useState(false);
-
-  const [showInputColor, setShowInputColor] = useState(false);
 
   const togglePaused = () => {
     timer.isPaused = !timer.isPaused;
@@ -88,44 +83,35 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
     ? new Date(timer.endAt).toLocaleTimeString()
     : "";
 
-  const maxDiameter = Math.min(
-    window.innerWidth - 60,
-    window.innerHeight - 100
-  );
-
   const isLarge = timer.id === maximize;
   const btnSize = isLarge ? 30 : 18;
 
-  useEffect(() => {
-    if (!timer.isRunning) {
-      if (timer.timeLeft > 0) return;
+  const diameter = isLarge
+    ? Math.min(window.innerWidth - 60, window.innerHeight - 100, 900)
+    : 200;
 
+  useEffect(() => {
+    if (timer.timeLeft > 0) return;
+
+    if (!timer.isRunning) {
       //timer ready to start
       timer.timeLeft = timer.duration * 1000;
       updateTimer(timer.id, timer);
     }
 
-    const interval = setInterval(() => {
-      if (timer.timeLeft <= 0 && timer.isRunning) {
-        // timer.isPaused = true;
-        timer.isRunning = false;
-        timer.timeLeft = 0;
-        updateTimer(timer.id, timer);
-        sendNotification({ title: timer.title ?? "Timer" });
-        clearInterval(interval);
-      }
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-    };
+    if (timer.timeLeft <= 0 && timer.isRunning) {
+      timer.isRunning = false;
+      updateTimer(timer.id, timer);
+      sendNotification({ title: timer.title ?? "Timer" });
+    }
   }, [timer.endAt, timer.isPaused, timer.timeLeft, timer.isRunning]);
 
   if (timer.isMinimized) {
-    return MinimizedTimerDisplay({ timer });
+    return MinimizedTimerDisplay({ timer, key });
   }
   return (
     <div
+      key={key}
       className={clsx([
         "group card border border-neutral",
         "bg-base-100 w-fit z-0",
@@ -139,34 +125,37 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
       }}
     >
       <div className="absolute flex flex-row gap-1 right-1 top-1">
-        <button className="btn btn-square btn-sm  opacity-5 group-hover:opacity-100">
-          <Palette
-            size={16}
-            onClick={() => {
-              setShowInputColor(!showInputColor);
-              setEditing(false);
-            }}
-          />
-        </button>
+        <Dialog blur={true}>
+          <DialogTrigger type="open">
+            <button className={hiddenBtnVariants({ size: "sm" })}>
+              <Palette
+                size={16}
+                onClick={() => {
+                  setEditing(false);
+                }}
+              />
+            </button>
+          </DialogTrigger>
+          <DialogContent position="center">
+            <TimerInputColor
+              timer={timer}
+              setColor={setColor}
+              withLabel={false}
+              withTemplate={true}
+              closeOnOutsideClick={true}
+            />
+          </DialogContent>
+        </Dialog>
+
         <button
           onClick={() => setMinimized()}
-          className="btn btn-square btn-sm  opacity-5 group-hover:opacity-100"
+          className={hiddenBtnVariants({ size: "sm" })}
         >
           <PanelBottom size={16} />
         </button>
         <CloseButton id={timer.id} />
       </div>
-      <div className="card-body items-center p-2">
-        {showInputColor && (
-          <div className="absolute -translate-y-10">
-            <TimerInputColor
-              timer={timer}
-              setColor={setColor}
-              withLabel={false}
-              onClose={() => setShowInputColor(false)}
-            />
-          </div>
-        )}
+      <div className="card-body items-center p-1">
         {isEditing ? (
           <div className="absolute -translate-y-10">
             <TimerInputName
@@ -184,7 +173,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
         <h2 className="card-title w-full">
           <div
             className={clsx(
-              "flex flex-row w-full justify-center cursor-pointer items-center border-neutral",
+              "flex flex-row w-full justify-center cursor-pointer items-center border-neutral transition-all  duration-700",
               {
                 "text-lg group-hover:justify-start": !isLarge,
                 "text-xl": isLarge,
@@ -192,7 +181,6 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
             )}
             style={{ color: timer.textColor }}
             onClick={() => {
-              setShowInputColor(false);
               setEditing(true);
             }}
           >
@@ -200,13 +188,13 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
             {timer.title ? timer.title : "Timer Display"}
           </div>
         </h2>
-        <div className="flex h-fit justify-center items-center">
+        <div className="relative flex h-fit justify-center items-center">
           <CountdownTimer
             bgColor={timer.bgColor}
             timeColor={timer.timeColor}
             pauseColor={timer.pauseColor}
             textColor={timer.textColor}
-            diameter={isLarge ? Math.min(maxDiameter, 900) : 200}
+            diameter={diameter}
             totalDuration={timer.duration}
             endTime={timerEnd}
             remainingTime={Math.max(timer.timeLeft, 0) / 1000}
@@ -214,43 +202,42 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
           />
           {timer.isPaused || !timer.isRunning ? (
             <div
-              className={clsx("absolute opacity-40 group-hover:opacity-90", {
-                "translate-y-44": isLarge,
-                "translate-y-16": !isLarge,
-              })}
+              className={clsx(
+                "absolute opacity-40 group-hover:opacity-90 transition-opacity",
+                {
+                  "translate-y-44": diameter >= 500,
+                  "translate-y-28": diameter >= 270 && diameter < 500,
+                  "translate-y-16": diameter < 270,
+                }
+              )}
             >
               <button
                 className={clsx("btn btn-success", {
-                  "h-fit p-5": isLarge,
-                  "btn-sm": !isLarge,
+                  "h-fit p-5": diameter >= 500,
+                  "h-fit p-3": diameter >= 270 && diameter < 500,
+                  "btn-sm": !isLarge || diameter < 270,
                 })}
                 onClick={() => {
                   timer.isRunning ? togglePaused() : restartTimer();
                 }}
               >
-                <Play size={isLarge ? 60 : 20} />
+                <Play size={diameter >= 500 ? 60 : diameter >= 270 ? 40 : 20} />
               </button>
             </div>
           ) : null}
-          <div className="absolute bottom-1 left-1 opacity-0 flex group-hover:opacity-90">
+          <div className="absolute bottom-0 left-0 flex">
             <button
-              className={clsx("btn", {
-                "btn-md": isLarge,
-                "btn-xs": !isLarge,
-              })}
+              className={hiddenBtnVariants({ size: isLarge ? "md" : "sm" })}
               onClick={() => toggleLarge()}
             >
               {isLarge ? <Shrink size={btnSize} /> : <Expand size={btnSize} />}
             </button>
           </div>
 
-          <div className="absolute bottom-1 right-1 opacity-0 flex gap-1 group-hover:opacity-90">
+          <div className="absolute bottom-0 right-0 flex gap-1">
             {timer.isRunning && timer.isPaused ? (
               <button
-                className={clsx("btn", {
-                  "btn-md": isLarge,
-                  "btn-xs": !isLarge,
-                })}
+                className={hiddenBtnVariants({ size: isLarge ? "md" : "sm" })}
                 onClick={() => restartTimer()}
               >
                 <RotateCcw size={btnSize} />
@@ -258,10 +245,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
             ) : null}
             {timer.isRunning ? (
               <button
-                className={clsx("btn", {
-                  "btn-md": isLarge,
-                  "btn-xs": !isLarge,
-                })}
+                className={hiddenBtnVariants({ size: isLarge ? "md" : "sm" })}
                 onClick={() => togglePaused()}
               >
                 {timer.isPaused ? (
@@ -274,6 +258,8 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer }) => {
           </div>
         </div>
       </div>
+
+      {/* Open the modal using document.getElementById('ID').showModal() method */}
     </div>
   );
 };
@@ -286,32 +272,29 @@ const CloseButton: React.FC<CloseButtonProps> = ({ id }) => {
   const { delTimer } = useTimersStore();
   return (
     <div className="w-8">
-      <Dialog>
+      <Dialog blur={false}>
         <DialogTrigger
           type="open"
-          className="btn btn-square btn-sm opacity-5 group-hover:opacity-100"
+          className={hiddenBtnVariants({ size: "sm", opacity: "10" })}
         >
           <X size={16} />
         </DialogTrigger>
         <DialogContent
           position="over"
-          blur={false}
           className="w-fit border border-base-300 bg-base-200 p-2 m-1 gap-2 rounded"
         >
-          <div>
-            <button
-              className="btn btn-square btn-sm  opacity-5 group-hover:opacity-100"
-              onClick={() => delTimer(id)}
-            >
-              <X size={16} />
-            </button>
-            <DialogTrigger
-              type="close"
-              className="btn btn-square btn-sm opacity-5 group-hover:opacity-100"
-            >
-              <MessageSquareOff size={16} />
-            </DialogTrigger>
-          </div>
+          <button
+            className={hiddenBtnVariants({ size: "sm", opacity: "60" })}
+            onClick={() => delTimer(id)}
+          >
+            <X size={16} />
+          </button>
+          <DialogTrigger
+            type="close"
+            className={hiddenBtnVariants({ size: "sm", opacity: "60" })}
+          >
+            <MessageSquareOff size={16} />
+          </DialogTrigger>
         </DialogContent>
       </Dialog>
     </div>
@@ -322,6 +305,7 @@ const CloseButton: React.FC<CloseButtonProps> = ({ id }) => {
  */
 export const MinimizedTimerDisplay: React.FC<TimerDisplayProps> = ({
   timer,
+  key,
 }) => {
   const { updateTimer, delTimer } = useTimersStore();
   const stopMinimized = () => {
@@ -329,7 +313,7 @@ export const MinimizedTimerDisplay: React.FC<TimerDisplayProps> = ({
     updateTimer(timer.id, timer);
   };
   return (
-    <div className="group relative border border-neutral w-full">
+    <div key={key} className="group relative border border-neutral w-full">
       <div className="absolute  right-1 top-1 w-8">
         <Dialog>
           <DialogTrigger
@@ -340,7 +324,6 @@ export const MinimizedTimerDisplay: React.FC<TimerDisplayProps> = ({
           </DialogTrigger>
           <DialogContent
             position="over"
-            blur={false}
             className="w-fit border border-base-300 bg-base-200 p-2 m-1 gap-2 rounded"
           >
             <div>
