@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useTimersStore } from "../hooks/zustand/timers";
+import { useTimerStore, useTimerActions } from "../hooks/zustand/timers";
 import { Timer } from "../types/timer";
 import {
   X,
@@ -36,8 +36,9 @@ interface TimerDisplayProps {
 }
 
 export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
-  const { updateTimer, maximize, lastEnded, setLastEnded, setMaximize } =
-    useTimersStore();
+  const { updateTimer, setLastEnded, setMaximize } = useTimerActions();
+  const { maximize, lastEnded } = useTimerStore();
+
   const [isEditing, setEditing] = useState(false);
 
   const togglePaused = () => {
@@ -136,7 +137,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
               />
             </button>
           </DialogTrigger>
-          <DialogContent position="center">
+          <DialogContent position="modal">
             <TimerInputColor
               timer={timer}
               setColor={setColor}
@@ -269,7 +270,7 @@ type CloseButtonProps = {
 };
 
 const CloseButton: React.FC<CloseButtonProps> = ({ id }) => {
-  const { delTimer } = useTimersStore();
+  const { delTimer } = useTimerActions();
   return (
     <div className="w-8">
       <Dialog blur={false}>
@@ -281,7 +282,7 @@ const CloseButton: React.FC<CloseButtonProps> = ({ id }) => {
         </DialogTrigger>
         <DialogContent
           position="over"
-          className="w-fit border border-base-300 bg-base-200 p-2 m-1 gap-2 rounded"
+          className="border border-base-300 bg-base-200 p-2 m-1 gap-2 rounded"
         >
           <button
             className={hiddenBtnVariants({ size: "sm", opacity: "60" })}
@@ -307,7 +308,7 @@ export const MinimizedTimerDisplay: React.FC<TimerDisplayProps> = ({
   timer,
   key,
 }) => {
-  const { updateTimer, delTimer } = useTimersStore();
+  const { updateTimer, delTimer } = useTimerActions();
   const stopMinimized = () => {
     timer.isMinimized = false;
     updateTimer(timer.id, timer);

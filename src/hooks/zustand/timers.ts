@@ -1,5 +1,5 @@
 "use client";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 
 import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
@@ -89,24 +89,28 @@ const zustandTimersStore = create(
  * Custom hook to access the timers store
  * @returns timers store
  */
-export const useTimersStore = () => {
+export const useTimerStore = () => {
   return zustandTimersStore(
     useShallow((state: any) => ({
       timers: state.timers,
       maximize: state.maximize,
       lastEnded: state.lastEnded,
       minimizedInput: state.minimizedInput,
-      getTimer: state.getTimer,
-      setTimers: state.setTimers,
-      addTimer: state.addTimer,
-      delTimer: state.delTimer,
-      updateTimer: state.updateTimer,
-      startTimers: state.startTimers,
-      setMaximize: state.setMaximize,
-      setLastEnded: state.setLastEnded,
-      setMinimizedInput: state.setMinimizedInput,
     }))
   );
+};
+export const useTimerActions = () => {
+  return zustandTimersStore((state: any) => ({
+    getTimer: state.getTimer,
+    setTimers: state.setTimers,
+    addTimer: state.addTimer,
+    delTimer: state.delTimer,
+    updateTimer: state.updateTimer,
+    startTimers: state.startTimers,
+    setMaximize: state.setMaximize,
+    setLastEnded: state.setLastEnded,
+    setMinimizedInput: state.setMinimizedInput,
+  }));
 };
 /**
  * Custom hook to start timers and filter out timers older than 24 hours

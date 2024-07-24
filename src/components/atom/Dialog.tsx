@@ -10,8 +10,15 @@ import React, {
 } from "react";
 import clsx from "clsx";
 
+type DialogContextType = {
+  open: boolean;
+  blur: boolean;
+  dialogRef: RefObject<HTMLDialogElement>;
+  setOpen: (open: boolean) => void;
+};
+
 const DialogContext = createContext(null);
-const useDialogContext = () => {
+const useDialogContext: () => DialogContextType = () => {
   const context = useContext(DialogContext);
   if (!context) throw new Error("DialogContext.Provider not found");
   // ✅ Sinon on va renvoyer le contexte
@@ -48,6 +55,7 @@ const useEventListener = ({
     };
   }, [isEnabled, type, element]);
 };
+
 const getFocusableElements = (ref: RefObject<HTMLElement>) =>
   Array.from(
     ref.current.querySelectorAll("a[href], button, textarea, input, select")
@@ -85,7 +93,7 @@ const useFocusTrap = (ref: RefObject<HTMLElement>, isEnabled: boolean) => {
 };
 
 export const Dialog = ({ children, blur = null }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const dialogRef = useRef(null);
 
   return (
@@ -199,19 +207,19 @@ export const DialogToggle: React.FC<DialogActionProps> = ({
 interface DialogContentProps {
   className?: string | null;
   children: React.ReactNode;
-  position?: "center" | "over" | "under";
+  position?: "modal" | "over" | "under";
 }
 
 export const DialogContent: React.FC<DialogContentProps> = ({
   className = null,
   children,
-  position = "center",
+  position = "modal",
 }) => {
   const { open, blur, dialogRef, setOpen } = useDialogContext();
   const ref = useRef(null);
 
   const handleClickOutside = (e) => {
-    const element = ref.current;
+    const element: HTMLElement = ref.current;
     if (element && !element.contains(e.target)) {
       setOpen(false);
     }
@@ -242,20 +250,23 @@ export const DialogContent: React.FC<DialogContentProps> = ({
   useFocusTrap(ref, open);
 
   return (
-    <dialog className={clsx({ modal: blur })} ref={dialogRef}>
-      <div
-        className={clsx(
-          "card shadow-xl animate-in fade-in-50",
-          {
-            "relative z-10  translate-x-3/4 -translate-y-full":
-              position === "over",
-            "relative z-10  my-1": position === "under",
-          },
-          className
-        )}
-      >
-        {className ? children : <div className="card-body">{children}</div>}
-      </div>
+    <dialog
+      ref={dialogRef}
+      className={clsx(
+        "shadow-xl animate-in fade-in-50",
+        {
+          "relative -translate-y-full": position === "over",
+          relative: position === "under",
+          modal: blur,
+        },
+        className
+      )}
+    >
+      {className ? (
+        <div className="card">{children}</div>
+      ) : (
+        <div className="card card-body">{children}</div>
+      )}
     </dialog>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { useTimersStore, useAndStartTimers } from "../hooks/zustand/timers";
+import { useTimerStore, useAndStartTimers } from "../hooks/zustand/timers";
 import { TimerInput } from "./TimerInput";
 import { TimerList } from "./TimerList";
 
@@ -26,7 +26,7 @@ export default function Home() {
 
   useAndStartTimers();
 
-  const { minimizedInput } = useTimersStore();
+  const { minimizedInput } = useTimerStore();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-8 lg:p-12">

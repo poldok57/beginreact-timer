@@ -1,13 +1,13 @@
 "use client";
 import React, { useRef, useEffect, useState, use } from "react";
-import { useTimersStore } from "../hooks/zustand/timers";
+import { useTimerStore, useTimerActions } from "../hooks/zustand/timers";
 import { TimerDisplay } from "./TimerDisplay";
 import { Timer } from "../types/timer";
 import { Timer as LucideTimer } from "lucide-react";
 
 export const TimerList = () => {
-  const { timers, maximize, minimizedInput, setMinimizedInput } =
-    useTimersStore();
+  const { timers, maximize, minimizedInput } = useTimerStore();
+  const { setMinimizedInput } = useTimerActions();
   const now = Date.now();
 
   const ref = useRef<HTMLDivElement>(null);

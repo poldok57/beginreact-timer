@@ -22,6 +22,7 @@ const DisplayColorPicker = ({
   const handleCopyColor = () => {
     navigator.clipboard.writeText(color);
   };
+  const windowHeight = window.innerHeight;
 
   useEffect(() => {
     let timerId = null;
@@ -47,7 +48,7 @@ const DisplayColorPicker = ({
       className="flex flex-col items-center z-20  w-fit gap-2 p-2 bg-white rounded-lg border border-base-200"
       ref={pickerRef}
     >
-      {label ? (
+      {label && windowHeight > 600 ? (
         <h3 className="flex justify-center text-lg font-bold">{label}</h3>
       ) : null}
       <div className="form-control">
@@ -71,12 +72,16 @@ const DisplayColorPicker = ({
             width="220px"
             onChange={(color) => setColor(fieldName, color.hex)}
           />
-          Theme colors
-          <GithubPicker
-            width="220px"
-            colors={themeColorsArray}
-            onChange={(color) => setColor(fieldName, color.hex)}
-          />
+          {windowHeight > 750 ? (
+            <>
+              Theme colors
+              <GithubPicker
+                width="220px"
+                colors={themeColorsArray}
+                onChange={(color) => setColor(fieldName, color.hex)}
+              />
+            </>
+          ) : null}
           <SliderPicker
             className="w-11/12"
             color={color}

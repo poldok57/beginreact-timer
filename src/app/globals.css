@@ -6,3 +6,9 @@ html,
 body {
   height: 100%;
 }
+
+dialog::backdrop {
+  /* Style pour l'arrière-plan de la modal */
+  background-color: rgba(30, 30, 30, 0.6); /* Assombrir l'arrière-plan */
+  backdrop-filter: blur(5px); /* Appliquer un flou à l'arrière-plan */
+}

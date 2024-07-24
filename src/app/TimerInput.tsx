@@ -5,7 +5,7 @@ import { useFocusTrap } from "../hooks/useFocusTrap";
 import { buttonVariants, lengendVariants } from "../style/form-variants";
 import { TwoDigitInput } from "./TwoDigitInput";
 import { Time } from "../types/timer";
-import { useTimersStore } from "../hooks/zustand/timers";
+import { useTimerStore, useTimerActions } from "../hooks/zustand/timers";
 import { filesetVariants } from "../style/form-variants";
 import { TimerInputName } from "./TimerInputName";
 import { TimerInputColor } from "./TimerInputColor";
@@ -75,7 +75,8 @@ export const TimerInput = () => {
 
     setTime(controleTime(newTime));
   };
-  const { addTimer, setMinimizedInput, minimizedInput } = useTimersStore();
+  const { minimizedInput } = useTimerStore();
+  const { addTimer, setMinimizedInput } = useTimerActions();
   const myBgColor = myThemeColors["base-200"];
   const [timerData, setTimerData] = useState({
     isRunning: true,
