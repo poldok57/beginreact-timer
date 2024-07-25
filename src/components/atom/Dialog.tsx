@@ -14,7 +14,7 @@ type DialogContextType = {
   open: boolean;
   blur: boolean;
   dialogRef: RefObject<HTMLDialogElement>;
-  setOpen: (open: boolean) => void;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const DialogContext = createContext(null);
