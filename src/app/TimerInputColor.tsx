@@ -5,22 +5,32 @@ import { CountdownTimer } from "../components/timer/CountdownTimer";
 import { myThemeColors } from "../../tailwind.config";
 import { GithubPicker, SliderPicker } from "react-color";
 import { Timer } from "../types/timer";
-import { X, Copy } from "lucide-react";
+import { X, Copy, Undo2 } from "lucide-react";
 import clsx from "clsx";
 import { hiddenBtnVariants } from "../style/form-variants";
+import { getContrastColor } from "../lib/colors";
 
 const themeColorsArray = ["#fff", "#000", ...Object.values(myThemeColors)];
 
-const DisplayColorPicker = ({
+interface DisplayColorPickerProps {
+  setColor: (fieldName: string, value: string) => void;
+  color: string;
+  memoColor: string;
+  fieldName: string;
+  label: string;
+  closeColorPicker: () => void;
+}
+const DisplayColorPicker: React.FC<DisplayColorPickerProps> = ({
   setColor,
   color,
+  memoColor,
   fieldName,
   label,
   closeColorPicker,
 }) => {
   const pickerRef = useRef<HTMLDivElement>(null);
   const handleCopyColor = () => {
-    navigator.clipboard.writeText(color);
+    navigator.clipboard.writeText(memoColor);
   };
   const windowHeight = window.innerHeight;
 
@@ -67,7 +77,6 @@ const DisplayColorPicker = ({
       </div>
       {color !== "transparent" && (
         <>
-          Standard colors
           <GithubPicker
             width="220px"
             onChange={(color) => setColor(fieldName, color.hex)}
@@ -89,6 +98,14 @@ const DisplayColorPicker = ({
             onChange={(color) => setColor(fieldName, color.hex)}
           />
           <div className="relative flex gap-2 items-center justify-center">
+            <button
+              className="btn btn-sm"
+              onClick={() => setColor(fieldName, memoColor)}
+              title="Revenir à la couleur initiale"
+              style={{ backgroundColor: memoColor }}
+            >
+              <Undo2 size={16} color={getContrastColor(memoColor)} />
+            </button>
             <input
               type="text"
               className="border border-gray-300 w-11/12 m-2focus:border-gray-800 p-3 rounded-md"
@@ -169,6 +186,7 @@ export const TimerInputColor: React.FC<TimerInputColorProps> = ({
   const ref = useRef<HTMLDivElement>(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [selectedField, setSelectedField] = useState<string | null>(null);
+  const [memoColor, setMemoColor] = useState<string | null>(null);
 
   const handlePickerIsOpen = (isOpen: boolean) => {
     setShowColorPicker(isOpen);
@@ -205,14 +223,19 @@ export const TimerInputColor: React.FC<TimerInputColorProps> = ({
   return (
     <div
       ref={ref}
-      className={clsx("flex flex-col justify-center items-center bg-base-100", {
-        "p-2": withTemplate,
-      })}
+      className={clsx(
+        "group/fieldset flex flex-col justify-center items-center bg-base-100",
+        {
+          "p-2": withTemplate,
+        }
+      )}
     >
       {withTemplate && (
         <>
           <DialogClose className="absolute top-1 right-4 p-2 z-20">
-            <button className={hiddenBtnVariants({ size: "sm" })}>
+            <button
+              className={hiddenBtnVariants({ size: "sm", group: "fieldset" })}
+            >
               <X size={16} />
             </button>
           </DialogClose>
@@ -240,6 +263,7 @@ export const TimerInputColor: React.FC<TimerInputColorProps> = ({
             withLabel={withLabel}
             onClick={() => {
               setSelectedField(fieldName);
+              setMemoColor(timer[fieldName]);
               handlePickerIsOpen(true);
             }}
           />
@@ -249,6 +273,7 @@ export const TimerInputColor: React.FC<TimerInputColorProps> = ({
         <DisplayColorPicker
           setColor={setColor}
           color={selectedColor}
+          memoColor={memoColor}
           fieldName={selectedField}
           label={label}
           closeColorPicker={() => handlePickerIsOpen(false)}

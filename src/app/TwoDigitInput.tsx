@@ -44,7 +44,7 @@ export const TwoDigitInput: React.FunctionComponent<any> = ({
   return (
     <label
       htmlFor={fieldName}
-      className="group h-fit flex relative flex-row items-center text-xl text-neutral text-semibold"
+      className="group/digit h-fit flex relative flex-row items-center text-xl text-neutral text-semibold"
     >
       <input
         type="text"
@@ -52,7 +52,7 @@ export const TwoDigitInput: React.FunctionComponent<any> = ({
         id={fieldName}
         value={value}
         onChange={handleChange}
-        className="w-24 p-2 text-6xl justify-center text-neutral font-semibold rounded-md group-hover:bg-accent"
+        className="w-24 p-2 text-6xl justify-center text-neutral font-semibold rounded-md group-hover/digit:bg-accent"
         placeholder="00"
         inputMode="numeric"
       />

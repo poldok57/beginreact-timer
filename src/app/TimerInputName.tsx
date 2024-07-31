@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, KeyboardEvent } from "react";
-import { filesetVariants, lengendVariants } from "../style/form-variants";
+import { fieldsetVariants, lengendVariants } from "../style/form-variants";
 import { hiddenBtnVariants } from "../style/form-variants";
 import { FieldLegend } from "./FieldLegend";
 import { X } from "lucide-react";

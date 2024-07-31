@@ -6,7 +6,7 @@ import { buttonVariants, lengendVariants } from "../style/form-variants";
 import { TwoDigitInput } from "./TwoDigitInput";
 import { Time } from "../types/timer";
 import { useTimerStore, useTimerActions } from "../hooks/zustand/timers";
-import { filesetVariants } from "../style/form-variants";
+import { fieldsetVariants } from "../style/form-variants";
 import { TimerInputName } from "./TimerInputName";
 import { TimerInputColor } from "./TimerInputColor";
 import { TimerTemplate } from "./TimerTemplate";
@@ -138,18 +138,9 @@ export const TimerInput = () => {
       className="fixed top-5 self-center z-10 bg-base-100 card border rounded-md shadow-lg min-w-80 border-base-300 my-2"
       tabIndex={0}
     >
-      <div className="group card-title text-xl justify-center text-neutral p-1">
+      <div className="card-title text-xl justify-center text-neutral p-1">
         Timer
         <div className="flex absolute top-2 right-1 gap-4 md:gap-2">
-          {/* <button
-            className={hiddenBtnVariants({
-              size: "sm",
-              opacity: "70",
-            })}
-            onClick={toggleSettings}
-          >
-            <Settings size={18} />
-          </button> */}
           <button
             className={hiddenBtnVariants({
               size: "sm",
@@ -165,7 +156,7 @@ export const TimerInput = () => {
         <div className="flex flex-col">
           <fieldset
             ref={ref}
-            className={filesetVariants({
+            className={fieldsetVariants({
               bg: "base200",
               className: "items-center",
             })}

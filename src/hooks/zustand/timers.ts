@@ -99,6 +99,10 @@ export const useTimerStore = () => {
     }))
   );
 };
+/**
+ * Custom hook to access the timers store actions
+ * @returns timers store actions
+ */
 export const useTimerActions = () => {
   return zustandTimersStore((state: any) => ({
     getTimer: state.getTimer,

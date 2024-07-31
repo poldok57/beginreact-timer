@@ -31,10 +31,7 @@ export const buttonVariants = cva(
 );
 
 export const hiddenBtnVariants = cva(
-  [
-    "btn btn-square hover:border-neutral",
-    "transition-opacity duration-300  group-hover:opacity-100",
-  ],
+  ["btn btn-square hover:border-neutral", "transition-opacity duration-300"],
   {
     variants: {
       variant: {
@@ -51,6 +48,11 @@ export const hiddenBtnVariants = cva(
         "50": "opacity-50",
         "60": "opacity-60",
         "80": "opacity-80",
+      },
+      group: {
+        display: "group-hover/display:opacity-100",
+        fieldset: "group-hover/fieldset:opacity-100",
+        dialog: "group-hover/dialog:opacity-100",
       },
       size: {
         xs: "btn-xs",
@@ -71,6 +73,7 @@ export const hiddenBtnVariants = cva(
       size: "md",
       opacity: "0",
       border: "neutral",
+      group: "fieldset",
     },
   }
 );
@@ -78,7 +81,7 @@ export const hiddenBtnVariants = cva(
 export const incrementBtnVariants = cva(
   [
     "text-neutral absolute rounded-full",
-    "hidden opacity-40 group-hover:flex hover:opacity-90",
+    "hidden opacity-40 group-hover/digit:flex hover:opacity-90",
   ],
   {
     variants: {
@@ -116,8 +119,8 @@ export const incrementBtnVariants = cva(
   }
 );
 
-export const filesetVariants = cva(
-  ["group input input-bordered my-2 rounded-md bg-base-200,"],
+export const fieldsetVariants = cva(
+  ["group/fieldset input input-bordered my-2 rounded-md bg-base-200,"],
   {
     variants: {
       theme: {
@@ -166,7 +169,7 @@ export const filesetVariants = cva(
 
 export const lengendVariants = cva(
   [
-    "text rounded-full border border-transparent group-hover:border-secondary py-1 px-3",
+    "text rounded-full border border-transparent group-hover/fieldset:border-secondary py-1 px-3",
   ],
   {
     variants: {

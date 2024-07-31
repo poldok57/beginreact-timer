@@ -114,7 +114,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
     <div
       key={key}
       className={clsx([
-        "group card border border-neutral",
+        "group/display card border border-neutral",
         "bg-base-100 w-fit z-0",
         {
           "border-3 outline-4 outline-offset-2 outline-double outline-red-400 border-red-600":
@@ -128,7 +128,9 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
       <div className="absolute flex flex-row gap-1 right-1 top-1">
         <Dialog blur={true}>
           <DialogTrigger type="open">
-            <button className={hiddenBtnVariants({ size: "sm" })}>
+            <button
+              className={hiddenBtnVariants({ size: "sm", group: "display" })}
+            >
               <Palette
                 size={16}
                 onClick={() => {
@@ -150,7 +152,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
 
         <button
           onClick={() => setMinimized()}
-          className={hiddenBtnVariants({ size: "sm" })}
+          className={hiddenBtnVariants({ size: "sm", group: "display" })}
         >
           <PanelBottom size={16} />
         </button>
@@ -176,7 +178,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
             className={clsx(
               "flex flex-row w-full justify-center cursor-pointer items-center border-neutral transition-all  duration-700",
               {
-                "text-lg group-hover:justify-start": !isLarge,
+                "text-lg group-hover/display:justify-start": !isLarge,
                 "text-xl": isLarge,
               }
             )}
@@ -204,7 +206,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
           {timer.isPaused || !timer.isRunning ? (
             <div
               className={clsx(
-                "absolute opacity-40 group-hover:opacity-90 transition-opacity",
+                "absolute opacity-40 group-hover/display:opacity-90 transition-opacity",
                 {
                   "translate-y-44": diameter >= 500,
                   "translate-y-28": diameter >= 270 && diameter < 500,
@@ -228,7 +230,10 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
           ) : null}
           <div className="absolute bottom-0 left-0 flex">
             <button
-              className={hiddenBtnVariants({ size: isLarge ? "md" : "sm" })}
+              className={hiddenBtnVariants({
+                size: isLarge ? "md" : "sm",
+                group: "display",
+              })}
               onClick={() => toggleLarge()}
             >
               {isLarge ? <Shrink size={btnSize} /> : <Expand size={btnSize} />}
@@ -238,7 +243,10 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
           <div className="absolute bottom-0 right-0 flex gap-1">
             {timer.isRunning && timer.isPaused ? (
               <button
-                className={hiddenBtnVariants({ size: isLarge ? "md" : "sm" })}
+                className={hiddenBtnVariants({
+                  size: isLarge ? "md" : "sm",
+                  group: "display",
+                })}
                 onClick={() => restartTimer()}
               >
                 <RotateCcw size={btnSize} />
@@ -246,7 +254,10 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
             ) : null}
             {timer.isRunning ? (
               <button
-                className={hiddenBtnVariants({ size: isLarge ? "md" : "sm" })}
+                className={hiddenBtnVariants({
+                  size: isLarge ? "md" : "sm",
+                  group: "display",
+                })}
                 onClick={() => togglePaused()}
               >
                 {timer.isPaused ? (
@@ -276,23 +287,35 @@ const CloseButton: React.FC<CloseButtonProps> = ({ id }) => {
       <Dialog blur={false}>
         <DialogTrigger
           type="open"
-          className={hiddenBtnVariants({ size: "sm", opacity: "10" })}
+          className={hiddenBtnVariants({
+            size: "sm",
+            opacity: "10",
+            group: "display",
+          })}
         >
           <X size={16} />
         </DialogTrigger>
         <DialogContent
           position="over"
-          className="border border-base-300 bg-base-200 p-2 m-1 gap-2 rounded"
+          className="group/dialog border border-base-300 bg-base-200 p-2 m-1 gap-2 rounded"
         >
           <button
-            className={hiddenBtnVariants({ size: "sm", opacity: "60" })}
+            className={hiddenBtnVariants({
+              size: "sm",
+              opacity: "60",
+              group: "dialog",
+            })}
             onClick={() => delTimer(id)}
           >
             <X size={16} />
           </button>
           <DialogTrigger
             type="close"
-            className={hiddenBtnVariants({ size: "sm", opacity: "60" })}
+            className={hiddenBtnVariants({
+              size: "sm",
+              opacity: "60",
+              group: "dialog",
+            })}
           >
             <MessageSquareOff size={16} />
           </DialogTrigger>
@@ -314,12 +337,15 @@ export const MinimizedTimerDisplay: React.FC<TimerDisplayProps> = ({
     updateTimer(timer.id, timer);
   };
   return (
-    <div key={key} className="group relative border border-neutral w-full">
+    <div
+      key={key}
+      className="group/minimized relative border border-neutral w-full"
+    >
       <div className="absolute  right-1 top-1 w-8">
         <Dialog>
           <DialogTrigger
             type="open"
-            className="btn btn-square btn-sm opacity-10 group-hover:opacity-100"
+            className="btn btn-square btn-sm opacity-10 group-hover/minimized:opacity-100"
           >
             <X size={16} />
           </DialogTrigger>
@@ -329,14 +355,14 @@ export const MinimizedTimerDisplay: React.FC<TimerDisplayProps> = ({
           >
             <div>
               <button
-                className="btn btn-square btn-sm  opacity-10 group-hover:opacity-100"
+                className="btn btn-square btn-sm  opacity-10 group-hover/minimized:opacity-100"
                 onClick={() => delTimer(timer.id)}
               >
                 <X size={16} />
               </button>
               <DialogTrigger
                 type="close"
-                className="btn btn-square btn-sm opacity-10 group-hover:opacity-100"
+                className="btn btn-square btn-sm opacity-10 group-hover/minimized:opacity-100"
               >
                 <MessageSquareOff size={16} />
               </DialogTrigger>

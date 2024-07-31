@@ -1,5 +1,5 @@
 import React from "react";
-import { filesetVariants, lengendVariants } from "../style/form-variants";
+import { fieldsetVariants, lengendVariants } from "../style/form-variants";
 import { hiddenBtnVariants } from "../style/form-variants";
 import { X } from "lucide-react";
 import clsx from "clsx";
@@ -23,7 +23,7 @@ export const FieldLegend: React.FC<FieldLegendProps> = ({
 }) => {
   return (
     <fieldset
-      className={filesetVariants({
+      className={fieldsetVariants({
         bg: "base200",
         flex: "row",
         items: items,
