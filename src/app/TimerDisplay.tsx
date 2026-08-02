@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, ComponentType } from "react";
 import { useTimerStore, useTimerActions } from "../hooks/zustand/timers";
 import { Timer } from "../types/timer";
 import {
@@ -29,14 +29,16 @@ import { TimerInputName } from "./TimerInputName";
 import { TimerInputColor } from "./TimerInputColor";
 
 import { hiddenBtnVariants } from "../style/form-variants";
+import { ButtonWithConfirm } from "../components/atom/ButtonWithConfirm";
 
 interface TimerDisplayProps {
-  key: string;
+  id: string;
   timer: Timer;
 }
 
-export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
-  const { updateTimer, setLastEnded, setMaximize } = useTimerActions();
+export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, id }) => {
+  const { updateTimer, setLastEnded, setMaximize, delTimer } =
+    useTimerActions();
   const { maximize, lastEnded } = useTimerStore();
 
   const [isEditing, setEditing] = useState(false);
@@ -108,11 +110,11 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
   }, [timer.endAt, timer.isPaused, timer.timeLeft, timer.isRunning]);
 
   if (timer.isMinimized) {
-    return MinimizedTimerDisplay({ timer, key });
+    return MinimizedTimerDisplay({ timer, id });
   }
   return (
     <div
-      key={key}
+      key={id}
       className={clsx([
         "group/display card border border-neutral",
         "bg-base-100 w-fit z-0",
@@ -156,7 +158,15 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
         >
           <PanelBottom size={16} />
         </button>
-        <CloseButton id={timer.id} />
+        <ButtonWithConfirm
+          btnSize={btnSize}
+          onConfirm={() => delTimer(timer.id)}
+          className={hiddenBtnVariants({
+            size: "sm",
+            opacity: "10",
+            group: "display",
+          })}
+        />
       </div>
       <div className="card-body items-center p-1">
         {isEditing ? (
@@ -276,60 +286,12 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timer, key }) => {
   );
 };
 
-type CloseButtonProps = {
-  id: string;
-};
-
-const CloseButton: React.FC<CloseButtonProps> = ({ id }) => {
-  const { delTimer } = useTimerActions();
-  return (
-    <div className="w-8">
-      <Dialog blur={false}>
-        <DialogTrigger
-          type="open"
-          className={hiddenBtnVariants({
-            size: "sm",
-            opacity: "10",
-            group: "display",
-          })}
-        >
-          <X size={16} />
-        </DialogTrigger>
-        <DialogContent
-          position="over"
-          className="group/dialog border border-base-300 bg-base-200 p-2 m-1 gap-2 rounded"
-        >
-          <button
-            className={hiddenBtnVariants({
-              size: "sm",
-              opacity: "60",
-              group: "dialog",
-            })}
-            onClick={() => delTimer(id)}
-          >
-            <X size={16} />
-          </button>
-          <DialogTrigger
-            type="close"
-            className={hiddenBtnVariants({
-              size: "sm",
-              opacity: "60",
-              group: "dialog",
-            })}
-          >
-            <MessageSquareOff size={16} />
-          </DialogTrigger>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
 /**
  * Minimized Timer Display
  */
 export const MinimizedTimerDisplay: React.FC<TimerDisplayProps> = ({
   timer,
-  key,
+  id,
 }) => {
   const { updateTimer, delTimer } = useTimerActions();
   const stopMinimized = () => {
@@ -338,7 +300,7 @@ export const MinimizedTimerDisplay: React.FC<TimerDisplayProps> = ({
   };
   return (
     <div
-      key={key}
+      key={id}
       className="group/minimized relative border border-neutral w-full"
     >
       <div className="absolute  right-1 top-1 w-8">

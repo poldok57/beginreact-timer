@@ -10,7 +10,7 @@ import React, {
 import clsx from "clsx";
 
 type DialogContextType = {
-  blur: boolean | null;
+  blur: boolean;
   dialogRef: RefObject<HTMLDialogElement>;
 };
 
@@ -21,19 +21,12 @@ const useDialogContext: () => DialogContextType = () => {
   // ✅ Sinon on va renvoyer le contexte
   return context;
 };
-
-interface EventListenerProps {
-  handler: (event: Event | KeyboardEvent | MouseEvent) => void;
-  isEnabled?: boolean;
-  type: string;
-  element?: Window | HTMLElement;
-}
 const useEventListener = ({
   handler,
   isEnabled = true,
   type,
   element = window,
-}: EventListenerProps): void => {
+}) => {
   const handlerRef = useRef(handler);
 
   useEffect(() => {
@@ -45,7 +38,7 @@ const useEventListener = ({
       return;
     }
 
-    const onEvent = (e: Event) => {
+    const onEvent = (e) => {
       handlerRef.current(e);
     };
 
@@ -57,19 +50,17 @@ const useEventListener = ({
   }, [isEnabled, type, element]);
 };
 
-const getFocusableElements = (ref: RefObject<HTMLElement>) => {
-  if (!ref.current) return [];
-  return Array.from(
+const getFocusableElements = (ref: RefObject<HTMLElement>) =>
+  Array.from(
     ref.current.querySelectorAll("a[href], button, textarea, input, select")
   ) as HTMLElement[];
-};
 
 const useFocusTrap = (ref: RefObject<HTMLElement>, isEnabled: boolean) => {
   useEventListener({
     type: "keydown",
     isEnabled,
-    handler: (event: Event) => {
-      if (!(event instanceof KeyboardEvent) || event.key !== "Tab") return;
+    handler: (event) => {
+      if (event.key !== "Tab") return;
 
       const focusableElements: HTMLElement[] = getFocusableElements(ref);
 
@@ -95,12 +86,8 @@ const useFocusTrap = (ref: RefObject<HTMLElement>, isEnabled: boolean) => {
   });
 };
 
-interface DialogProps {
-  children: React.ReactNode;
-  blur?: boolean | null;
-}
-export const Dialog: React.FC<DialogProps> = ({ children, blur = null }) => {
-  const dialogRef = useRef<HTMLDialogElement | null>(null);
+export const Dialog = ({ children, blur = null }) => {
+  const dialogRef = useRef(null);
 
   return (
     <DialogContext.Provider value={{ blur, dialogRef }}>
@@ -122,7 +109,7 @@ interface DialogTriggerProps extends DialogActionProps {
 }
 
 function isClickableElement(
-  element: React.ReactNode
+  element: any
 ): element is React.ReactElement<ClickableProps> {
   return React.isValidElement(element); //&& typeof element.props.onClick === "function"
 }
@@ -176,7 +163,7 @@ export const DialogTrigger: React.FC<DialogTriggerProps> = ({
       },
     })
   ) : (
-    <button className={className || ""} onClick={() => handleClick()}>
+    <button className={className} onClick={() => handleClick()}>
       {children}
     </button>
   );
@@ -231,45 +218,40 @@ export const DialogContent: React.FC<DialogContentProps> = ({
 }) => {
   const { blur, dialogRef } = useDialogContext();
   const ref = useRef(null);
-  const open = true; //dialogRef.current?.open;
 
-  const handleClickOutside = (e: Event) => {
-    if (!(e instanceof MouseEvent)) return;
-    const element: HTMLElement | null = ref.current as HTMLElement | null;
+  const handleClickOutside = (e: MouseEvent) => {
+    const element: HTMLElement | null = ref.current;
+    console.log("click outside element", element);
     if (element && !element.contains(e.target as Node)) {
+      // console.log("click outside element and close");
       if (dialogRef.current) {
-        console.log("click outside");
         dialogRef.current.close();
       }
     }
   };
 
   useEventListener({
-    isEnabled: open,
     type: "mousedown",
     handler: handleClickOutside,
   });
 
   useEventListener({
-    isEnabled: open,
     type: "touchstart",
     handler: handleClickOutside,
   });
 
   useEventListener({
-    isEnabled: open,
     type: "keydown",
-    handler: (event: Event) => {
-      if (event instanceof KeyboardEvent && event.key === "Escape") {
+    handler: (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
         if (dialogRef.current) {
-          console.log("keydown escape");
           dialogRef.current.close();
         }
       }
     },
   });
 
-  useFocusTrap(ref, open || false);
+  useFocusTrap(ref, true);
 
   return (
     <dialog

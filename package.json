@@ -33,12 +33,13 @@
     "typescript": "^5",
     "zustand": "^4.5.4"
   },
-  "overrides": {
-    "postcss": "$postcss"
-  },
   "pnpm": {
     "overrides": {
       "postcss": "^8.5.25"
     }
-  }
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "packageManager": "pnpm@9.15.9"
 }

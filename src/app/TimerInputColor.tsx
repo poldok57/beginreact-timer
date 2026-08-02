@@ -3,128 +3,13 @@ import { FieldLegend } from "./FieldLegend";
 import { DialogClose } from "../components/atom/Dialog";
 import { CountdownTimer } from "../components/timer/CountdownTimer";
 import { myThemeColors } from "../../tailwind.config";
-import { GithubPicker, SliderPicker } from "react-color";
 import { Timer } from "../types/timer";
-import { X, Copy, Undo2 } from "lucide-react";
+import { X } from "lucide-react";
 import clsx from "clsx";
 import { hiddenBtnVariants } from "../style/form-variants";
-import { getContrastColor } from "../lib/colors";
+import { DisplayColorPicker } from "../components/colors/DisplayColorPicker";
 
 const themeColorsArray = ["#fff", "#000", ...Object.values(myThemeColors)];
-
-interface DisplayColorPickerProps {
-  setColor: (fieldName: string, value: string) => void;
-  color: string;
-  memoColor: string;
-  fieldName: string;
-  label: string;
-  closeColorPicker: () => void;
-}
-const DisplayColorPicker: React.FC<DisplayColorPickerProps> = ({
-  setColor,
-  color,
-  memoColor,
-  fieldName,
-  label,
-  closeColorPicker,
-}) => {
-  const pickerRef = useRef<HTMLDivElement>(null);
-  const handleCopyColor = () => {
-    navigator.clipboard.writeText(memoColor);
-  };
-  const windowHeight = window.innerHeight;
-
-  useEffect(() => {
-    let timerId = null;
-
-    if (!pickerRef.current) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closeColorPicker();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      if (timerId) clearTimeout(timerId);
-    };
-  }, []);
-
-  return (
-    <div
-      className="flex flex-col items-center z-20  w-fit gap-2 p-2 bg-white rounded-lg border border-base-200"
-      ref={pickerRef}
-    >
-      {label && windowHeight > 600 ? (
-        <h3 className="flex justify-center text-lg font-bold">{label}</h3>
-      ) : null}
-      <div className="form-control">
-        <label htmlFor={fieldName} className="flex gap-2 items-center">
-          <input
-            id={fieldName}
-            type="checkbox"
-            className="toggle toggle-success toggle-sm"
-            checked={color === "transparent"}
-            onChange={(e) =>
-              setColor(fieldName, e.target.checked ? "transparent" : "#888")
-            }
-          />
-          <span className="text-primary">Transparent</span>
-        </label>
-      </div>
-      {color !== "transparent" && (
-        <>
-          <GithubPicker
-            width="220px"
-            onChange={(color) => setColor(fieldName, color.hex)}
-          />
-          {windowHeight > 750 ? (
-            <>
-              Theme colors
-              <GithubPicker
-                width="220px"
-                colors={themeColorsArray}
-                onChange={(color) => setColor(fieldName, color.hex)}
-              />
-            </>
-          ) : null}
-          <SliderPicker
-            className="w-11/12"
-            color={color}
-            disableAlpha={true}
-            onChange={(color) => setColor(fieldName, color.hex)}
-          />
-          <div className="relative flex gap-2 items-center justify-center">
-            <button
-              className="btn btn-sm"
-              onClick={() => setColor(fieldName, memoColor)}
-              title="Revenir à la couleur initiale"
-              style={{ backgroundColor: memoColor }}
-            >
-              <Undo2 size={16} color={getContrastColor(memoColor)} />
-            </button>
-            <input
-              type="text"
-              className="border border-gray-300 w-11/12 m-2focus:border-gray-800 p-3 rounded-md"
-              value={color}
-              onChange={(e) => setColor(fieldName, e.target.value)}
-            />
-            <button
-              className="btn btn-sm absolute right-2 p-2 m-2"
-              onClick={handleCopyColor}
-              title="Copy to clipboard"
-            >
-              <Copy size={16} />
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
 
 interface InputColorProps {
   fieldName: string;
@@ -273,6 +158,7 @@ export const TimerInputColor: React.FC<TimerInputColorProps> = ({
         <DisplayColorPicker
           setColor={setColor}
           color={selectedColor}
+          themeColors={themeColorsArray}
           memoColor={memoColor}
           fieldName={selectedField}
           label={label}

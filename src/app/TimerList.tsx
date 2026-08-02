@@ -61,7 +61,7 @@ export const TimerList = () => {
               return remainingTimeA - remainingTimeB; // Compare par temps restant
             })
             .map((timer: Timer) => (
-              <TimerDisplay timer={timer} key={timer.id} />
+              <TimerDisplay timer={timer} id={timer.id} key={timer.id} />
             ))}
         </div>
       ) : null}
@@ -70,7 +70,7 @@ export const TimerList = () => {
           ref={ref}
           className="flex flex-col items-center mx-auto w-fit mb-2"
         >
-          <TimerDisplay timer={maximizedTimer} key={maximizedTimer.id} />
+          <TimerDisplay timer={maximizedTimer} id={maximizedTimer.id} />
         </div>
       ) : (
         <></>
@@ -81,7 +81,7 @@ export const TimerList = () => {
         className="grid grid-cols-1 gap-2 lg:gap-4 md:grid-cols-2 lg:grid-cols-3"
       >
         {otherTimers.map((timer: Timer) => (
-          <TimerDisplay key={timer.id} timer={timer} />
+          <TimerDisplay id={timer.id} timer={timer} key={timer.id} />
         ))}
       </div>
     </div>
